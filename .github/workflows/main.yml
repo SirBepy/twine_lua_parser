@@ -30,7 +30,9 @@ jobs:
         run: ls -R ./dist
 
       - name: Prepare Publishing Assets
-        run: cp -r ./dist/* $GITHUB_WORKSPACE/actions_github_pages
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/actions_github_pages
+          cp -r ./dist/* $GITHUB_WORKSPACE/actions_github_pages
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
