@@ -132,9 +132,9 @@ twine_lua_parser.convertStory = function (story) {
 };
 
 twine_lua_parser.init = function () {
-  var storyData = document.getElementsByTagName("tw-storydata")[0];
-  var json = JSON.stringify(twine_lua_parser.convertStory(storyData), null, 2);
-  document.getElementById("output").innerHTML = "<div>hey!</div>";
+  const storyData = document.getElementsByTagName("tw-storydata")[0];
+  const json = JSON.stringify(twine_lua_parser.convertStory(storyData), null, 2);
+  document.getElementById("output").innerHTML = json;
 };
 
 window.twine_lua_parser = twine_lua_parser;
