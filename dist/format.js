@@ -1,6 +1,6 @@
-window.storyFormat({
+wwindowwindowindow.storyFormat({
   "name": "twine_lua_parser",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "SirBepy",
   "description": "Export your Twine 2 story as a lua file (RobloxStudio)",
   "proofing": false,
