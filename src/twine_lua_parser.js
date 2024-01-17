@@ -1,12 +1,11 @@
 const twine_lua_parser = {};
+
 twine_lua_parser.extractLinksFromText = function (text) {
-  var links = text.match(/\[\[.+?\]\]/g);
-  if (!links) {
-    return null;
-  }
+  const links = text.match(/\[\[.+?\]\]/g);
+  if (!links) return null;
 
   return links.map(function (link) {
-    var differentName = link.match(/\[\[(.*?)\-\&gt;(.*?)\]\]/);
+    const differentName = link.match(/\[\[(.*?)\-\&gt;(.*?)\]\]/);
     if (differentName) {
       // [[name->link]]
       return {
@@ -24,96 +23,69 @@ twine_lua_parser.extractLinksFromText = function (text) {
   });
 };
 
-twine_lua_parser.extractPropsFromText = function (text) {
-  var props = {};
-  var propMatch;
-  var matchFound = false;
-  const propRegexPattern = /\{\{((\s|\S)+?)\}\}((\s|\S)+?)\{\{\/\1\}\}/gm;
+twine_lua_parser.extractPropsFromText = function (dict) {
+  const props = {};
+  const setRegexPattern = /\(set:\s*\$(\w+)\s*to\s*"([^"]+)"\)/g;
 
-  while ((propMatch = propRegexPattern.exec(text)) !== null) {
-    // The "key" of the prop, AKA the value wrapped in {{ }}.
-    const key = propMatch[1];
+  dict.text = dict.text.replace(setRegexPattern, function (match, variableName, variableValue) {
+    props[variableName] = variableValue;
+    return ''; // Replace the match with an empty string
+  });
 
-    // Extract and sanitize the actual value.
-    // This will remove any new lines.
-    const value = propMatch[3].replace(/(\r\n|\n|\r)/gm, "");
+  // Remove any extra whitespace resulting from removal of matches
+  dict.text = dict.text.trim();
 
-    // We can nest props like so: {{foo}}{{bar}}value{{/bar}}{{/foo}},
-    // so call this same method again to extract the values further.
-    const furtherExtraction = this.extractPropsFromText(value);
-
-    if (furtherExtraction !== null) {
-      props[key] = furtherExtraction;
-    } else {
-      props[key] = value;
-    }
-
-    matchFound = true;
-  }
-
-  if (!matchFound) {
-    return null;
-  }
-
-  return props;
+  // Return props if at least one match was found, otherwise return null
+  return Object.keys(props).length > 0 ? props : null;
 };
 
-twine_lua_parser.convertPassage = function (passage) {
-  var dict = { text: passage.innerHTML };
 
-  var links = twine_lua_parser.extractLinksFromText(dict.text);
+
+twine_lua_parser.convertPassage = function (passage) {
+  const dict = { text: passage.innerHTML };
+
+  const links = twine_lua_parser.extractLinksFromText(dict.text);
   if (links) {
     dict.links = links;
   }
 
-  const props = twine_lua_parser.extractPropsFromText(dict.text);
+  const props = twine_lua_parser.extractPropsFromText(dict);
   if (props) {
     dict.props = props;
   }
 
-  ["name", "pid", "position", "tags"].forEach(function (attr) {
-    var value = passage.attributes[attr].value;
+  ["name", "pid", "tags"].forEach(function (attr) {
+    const value = passage.attributes[attr].value;
     if (value) {
       dict[attr] = value;
     }
   });
 
-  if (dict.position) {
-    var position = dict.position.split(",");
-    dict.position = {
-      x: position[0],
-      y: position[1],
-    };
-  }
-
-  if (dict.tags) {
-    dict.tags = dict.tags.split(" ");
-  }
+  if (dict.tags) dict.tags = dict.tags.split(" ");
 
   return dict;
 };
 
 twine_lua_parser.convertStory = function (story) {
-  var passages = story.getElementsByTagName("tw-passagedata");
-  var convertedPassages = Array.prototype.slice
+  const passages = story.getElementsByTagName("tw-passagedata");
+  const convertedPassages = Array.prototype.slice
     .call(passages)
     .map(twine_lua_parser.convertPassage);
 
-  var dict = {
-    passages: convertedPassages,
-  };
+  const dict = { passages: convertedPassages };
 
-  ["name", "startnode", "creator", "creator-version", "ifid"].forEach(function (
-    attr
-  ) {
-    var value = story.attributes[attr].value;
-    if (value) {
-      dict[attr] = value;
+  ["name", "startnode"].forEach(
+    function (attr) {
+      const value = story.attributes[attr].value;
+      if (value) {
+        dict[attr] = value;
+      }
     }
-  });
+  );
 
   // Add PIDs to links
-  var pidsByName = {};
+  const pidsByName = {};
+
   dict.passages.forEach(function (passage) {
     pidsByName[passage.name] = passage.pid;
   });
@@ -122,9 +94,6 @@ twine_lua_parser.convertStory = function (story) {
     if (!passage.links) return;
     passage.links.forEach(function (link) {
       link.pid = pidsByName[link.link];
-      if (!link.pid) {
-        link.broken = true;
-      }
     });
   });
 
@@ -133,7 +102,11 @@ twine_lua_parser.convertStory = function (story) {
 
 twine_lua_parser.init = function () {
   const storyData = document.getElementsByTagName("tw-storydata")[0];
-  const json = JSON.stringify(twine_lua_parser.convertStory(storyData), null, 2);
+  const json = JSON.stringify(
+    twine_lua_parser.convertStory(storyData),
+    null,
+    2
+  );
   document.getElementById("output").innerHTML = json;
 };
 
