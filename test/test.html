@@ -3,7 +3,7 @@
     <title>twine_lua_parser-Test</title>
     <script type="text/javascript">
       var twine_lua_parser = {
-        extractLinksFromText: function (t) {
+        extractResponsesFromText: function (t) {
           var n = t.match(/\[\[.+?\]\]/g);
           return n
             ? n.map(function (t) {
@@ -26,8 +26,8 @@
         },
         convertPassage: function (t) {
           var n = { text: t.innerHTML },
-            r = twine_lua_parser.extractLinksFromText(n.text);
-          r && (n.links = r);
+            r = twine_lua_parser.extractResponsesFromText(n.text);
+          r && (n.responses = r);
           const a = twine_lua_parser.extractPropsFromText(n.text);
           if (
             (a && (n.props = a),
@@ -58,8 +58,8 @@
               e[t.name] = t.pid;
             }),
             a.passages.forEach(function (t) {
-              t.links &&
-                t.links.forEach(function (t) {
+              t.responses &&
+                t.responses.forEach(function (t) {
                   (t.pid = e[t.link]), t.pid || (t.broken = !0);
                 });
             }),
