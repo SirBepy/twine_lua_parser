@@ -1,4 +1,31 @@
-import { convertToLuaScript } from "../src/export_to_lua";
+const parseValueAsLuaObject = (value) => {
+  const valueType = typeof value;
+  if (value === null) return null;
+  if (Array.isArray(value)) {
+    const elements = value.map(parseValueAsLuaObject).join(", ");
+    return `{${elements}}`;
+  }
+
+  switch (valueType) {
+    case "number":
+    case "boolean":
+      return value.toString();
+    case "string":
+      return `"${value}"`;
+    case "object": {
+      const properties = Object.entries(value)
+        .map(([key, val]) => `${key} = ${parseValueAsLuaObject(val)}`)
+        .join(", ");
+      return `{${properties}}`;
+    }
+    default:
+      throw new Error(`Unsupported data type: ${valueType}`);
+  }
+};
+
+const convertToLuaScript = (data) => {
+  return `return ${parseValueAsLuaObject(data)}`;
+};
 
 const twine_lua_parser = {};
 
@@ -108,4 +135,3 @@ twine_lua_parser.init = () => {
 };
 
 window.twine_lua_parser = twine_lua_parser;
-export { twine_lua_parser };

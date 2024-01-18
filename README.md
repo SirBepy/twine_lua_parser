@@ -10,7 +10,7 @@ It is heavily inspired by [Twison](https://github.com/lazerwalker/twison)
 
 From the Twine home screen, go into Twine -> Story Formats -> Add
 Then paste the following
-`https://sirbepy.com/twine_lua_parser/format.js`.
+`https://sirbepy.github.io/twine_lua_parser/dist/format.js`.
 
 ## Output
 

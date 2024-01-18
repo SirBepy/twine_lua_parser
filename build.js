@@ -2,9 +2,9 @@ import { minify } from "minify";
 import fs from "fs";
 
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-const js = minify("src/twine_lua_parser.js");
+const js = await minify("./src/index.js");
 let html = fs.readFileSync("src/storyFormat.html", "utf-8");
-html = html.replace("{{SCRIPT}}", js.code);
+html = html.replace("{{SCRIPT}}", js);
 
 const outputJSON = {
   name: pkg.name,
