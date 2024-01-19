@@ -11,7 +11,9 @@ const parseValueAsLuaObject = (value) => {
     case "boolean":
       return value.toString();
     case "string":
-      return `"${value}"`;
+      return JSON.stringify(value)
+        .replace(/\\n\s+/g, "\\n")
+        .replace(/\s+\\n/g, "\\n");
     case "object": {
       const properties = Object.entries(value)
         .map(([key, val]) => `${key} = ${parseValueAsLuaObject(val)}`)
@@ -29,32 +31,27 @@ const convertToLuaScript = (data) => {
 
 const twine_lua_parser = {};
 
-twine_lua_parser.extractResponsesFromText = (text) => {
+twine_lua_parser.extractResponsesFromText = (dict) => {
+  const text = dict.text
   const responses = text.match(/\[\[.+?\]\]/g);
   if (!responses) return null;
+  // remove all [[]]
+  dict.text = dict.text.replace(/\[\[.*?\]\]/g, '');
 
-  return responses.map((link) => {
-    const differentName = link.match(/\[\[(.*?)\-\&gt;(.*?)\]\]/);
-    if (differentName) {
-      // [[name->link]]
-      return {
-        response: differentName[1],
-        link: differentName[2],
-      };
-    } else {
-      // [[link]]
-      link = link.substring(2, link.length - 2);
-      return {
-        response: link,
-        link: link,
-      };
-    }
+  return responses.map((text) => {
+    const safeLink = text.replace(/^\[+|\]+$/g, "");
+    const [response, link] = safeLink.split("|");
+    return {
+      isDone: response.startsWith('---'),
+      response: response.replace(/^---\s*/, ''),
+      link: link ?? response,
+    };
   });
 };
 
 twine_lua_parser.extractPropsFromText = (dict) => {
   const props = {};
-  const setRegexPattern = /\(set:\s*\$(\w+)\s*to\s*"([^"]+)"\)/g;
+  const setRegexPattern = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/g;
 
   dict.text = dict.text.replace(
     setRegexPattern,
@@ -74,7 +71,7 @@ twine_lua_parser.extractPropsFromText = (dict) => {
 twine_lua_parser.convertPassage = (passage) => {
   const dict = { text: passage.innerHTML };
 
-  const responses = twine_lua_parser.extractResponsesFromText(dict.text);
+  const responses = twine_lua_parser.extractResponsesFromText(dict);
   if (responses) {
     dict.responses = responses;
   }
@@ -92,6 +89,9 @@ twine_lua_parser.convertPassage = (passage) => {
   });
 
   if (dict.tags) dict.tags = dict.tags.split(" ");
+  
+  // remove all trailing \n
+  dict.text = dict.text.replace(/\s+$/g, '')
 
   return dict;
 };
@@ -125,13 +125,15 @@ twine_lua_parser.convertStory = (story) => {
     });
   });
 
-  return dict;
+  return JSON.parse(JSON.stringify(dict));
 };
 
 twine_lua_parser.init = () => {
   const storyData = document.getElementsByTagName("tw-storydata")[0];
-  const json = convertToLuaScript(twine_lua_parser.convertStory(storyData));
-  document.getElementById("output").innerHTML = json;
+  const response = convertToLuaScript(twine_lua_parser.convertStory(storyData));
+  document.getElementById("output").innerHTML = response;
 };
 
-window.twine_lua_parser = twine_lua_parser;
+if (typeof window !== "undefined") window.twine_lua_parser = twine_lua_parser;
+
+export { twine_lua_parser };

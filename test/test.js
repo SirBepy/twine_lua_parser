@@ -1,28 +1,29 @@
-var expect = require("chai").expect;
-var fs = require("fs");
-require("jsdom-global")();
+import chai from "chai";
+import fs from "fs";
+import jsdom from "jsdom-global";
+import { twine_lua_parser } from "../src/index.js";
+jsdom()
 
 var story;
 
-describe("Converting to JSON", function () {
-  it("should generate the correct JSON", function () {
-    var storyData = fs.readFileSync("fixture.html", "utf-8");
-    var div = document.createElement("div");
+describe("Converting to Lua", function () {
+  it("Generated the same lua file as before", function () {
+    const storyData = fs.readFileSync("./test/fixture.html", "utf-8");
+    const div = document.createElement("div");
     div.innerHTML = storyData;
     story = div.childNodes[0];
     document.body.appendChild(story);
 
-    var output = document.createElement("div");
+    const output = document.createElement("div");
     output.setAttribute("id", "output");
     document.body.appendChild(output);
 
-    var expected = fs.readFileSync("output.json", "utf-8");
+    const expected = fs.readFileSync("./test/expected.lua", "utf-8");
 
-    require("../src/twine_lua_parser.js");
+    twine_lua_parser.init(story);
+    const result = document.getElementById("output").innerHTML;
+    fs.writeFileSync('./test/result.lua', result)
 
-    window.twine_lua_parser.init(story);
-    var result = document.getElementById("output").innerHTML;
-
-    expect(result).to.equal(expected);
+    chai.expect(result).to.equal(expected);
   });
 });
