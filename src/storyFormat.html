@@ -1,17 +1,99 @@
 <html>
-  <head>
-    <title>{{STORY_NAME}}</title>
-    <script type="text/javascript">
-      {{SCRIPT}}
-    </script>
-  </head>
-  <body>
-    <pre id="output"></pre>
-    <div id="storyData" style="display: none;">
-      {{STORY_DATA}}
-    </div>
-    <script>
-      parseTwineToLua();
-    </script>
-  </body>
+
+<head>
+  <title>{{STORY_NAME}}</title>
+  <script type="text/javascript">
+    {{SCRIPT}}
+  </script>
+  <style>
+    body,
+    html {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      background-color: #365486;
+      color: #7FC7D9;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    #storyData {
+      display: none;
+    }
+
+    #output {
+      width: 500px;
+      height: 500px;
+      max-width: 80vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-wrap: wrap;
+      opacity: 0.5;
+      padding: 1em;
+      border: #0F1035 4px solid;
+      border-radius: 10px;
+    }
+
+    button {
+      width: 180px;
+      height: 40px;
+      border-radius: 10px;
+      font-size: 1.2em;
+      background-color: #7FC7D9;
+      color: white;
+      border: #DCF2F1 1px solid;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.5;
+    }
+
+    button:active {
+      opacity: 0.2;
+    }
+
+    button:disabled {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <button onclick="copyText(this)">Copy output</button>
+  <pre id="output"></pre>
+  <div id="storyData">
+    {{STORY_DATA}}
+  </div>
+  <script>
+    function copyText() {
+      const textToCopy = document.getElementById("output").innerText;
+      const textarea = document.createElement("textarea");
+      textarea.value = textToCopy;
+
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      const button = document.querySelector('button');
+      button.textContent = 'Copied to clipboard';
+      button.disabled = true
+
+      setTimeout(() => {
+        button.textContent = 'Copy output';
+        button.disabled = false
+      }, 1500);
+    }
+    parseTwineToLua();
+  </script>
+</body>
+
 </html>
