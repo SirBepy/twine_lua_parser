@@ -111,20 +111,6 @@ twine_lua_parser.convertStory = (story) => {
     }
   });
 
-  // Add PIDs to responses
-  const pidsByName = {};
-
-  dict.passages.forEach((passage) => {
-    pidsByName[passage.name] = passage.pid;
-  });
-
-  dict.passages.forEach((passage) => {
-    if (!passage.responses) return;
-    passage.responses.forEach((link) => {
-      link.pid = pidsByName[link.link];
-    });
-  });
-
   return JSON.parse(JSON.stringify(dict));
 };
 
