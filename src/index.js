@@ -46,8 +46,8 @@ const extractResponsesFromText = (dict) => {
   const text = dict.text;
   const responses = text.match(/\[\[.+?\]\]/g);
   if (!responses) return null;
-  // remove all [[]]
-  dict.text = dict.text.replace(/\[\[.*?\]\]/g, "");
+
+  dict.text = dict.text.replace(/\[\[.*?\]\]/g, ""); // remove all [[]]
 
   return responses.map(parseResponse);
 };
@@ -64,10 +64,8 @@ const extractPropsFromText = (dict) => {
     }
   );
 
-  // Remove any extra whitespace resulting from removal of matches
   dict.text = dict.text.trim();
 
-  // Return props if at least one match was found, otherwise return null
   return Object.keys(props).length > 0 ? props : null;
 };
 
@@ -75,26 +73,18 @@ const convertPassage = (passage) => {
   const dict = { text: passage.innerHTML };
 
   const responses = extractResponsesFromText(dict);
-  if (responses) {
-    dict.responses = responses;
-  }
+  if (responses) dict.responses = responses;
 
   const props = extractPropsFromText(dict);
-  if (props) {
-    dict.props = props;
-  }
+  if (props) dict.props = props;
 
-  ["name", "tags"].forEach((attr) => {
+  ["name", "tags", "pid"].forEach((attr) => {
     const value = passage.attributes[attr].value;
-    if (value) {
-      dict[attr] = value;
-    }
+    if (value) dict[attr] = value;
   });
 
   if (dict.tags) dict.tags = dict.tags.split(" ");
-
-  // remove all trailing \n
-  dict.text = dict.text.replace(/\s+$/g, "");
+  dict.text = dict.text.replace(/\s+$/g, ""); // remove all trailing \n
 
   return dict;
 };
@@ -108,11 +98,11 @@ const convertStory = (story) => {
   const dict = {
     passages: {},
     name: story.attributes.name.value,
-    startnode: story.attributes.startnode.value,
+    start_node_name: convertedPassages.find(passage => passage.pid == story.attributes.startnode.value).name
   };
 
   convertedPassages.forEach((row) => {
-    dict.passages[row.name] = { ...row, name: undefined };
+    dict.passages[row.name] = { ...row, name: undefined, pid: undefined };
   });
 
   return JSON.parse(JSON.stringify(dict));

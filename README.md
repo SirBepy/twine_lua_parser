@@ -94,7 +94,7 @@ return {
         tutorial_320 = {text = 'Bye'}
     },
     name = 'HT - Butler',
-    startnode = '2'
+    start_node_name = 'tutorial_100'
 }
 
 ```
