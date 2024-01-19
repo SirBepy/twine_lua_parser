@@ -29,34 +29,37 @@ const convertToLuaScript = (data) => {
   return `return ${parseValueAsLuaObject(data)}`;
 };
 
-const twine_lua_parser = {};
+const parseResponse = (text) => {
+  const safeLink = text.replace(/^\[+|\]+$/g, "");
+  const [response, link] = safeLink.split("|");
+  const toReturn = {
+    response: response.replace(/^---\s*/, ""),
+    link: link ?? response,
+  };
+  if (response.startsWith("---")) {
+    toReturn.isEnd = true;
+  }
+  return toReturn;
+};
 
-twine_lua_parser.extractResponsesFromText = (dict) => {
-  const text = dict.text
+const extractResponsesFromText = (dict) => {
+  const text = dict.text;
   const responses = text.match(/\[\[.+?\]\]/g);
   if (!responses) return null;
   // remove all [[]]
-  dict.text = dict.text.replace(/\[\[.*?\]\]/g, '');
+  dict.text = dict.text.replace(/\[\[.*?\]\]/g, "");
 
-  return responses.map((text) => {
-    const safeLink = text.replace(/^\[+|\]+$/g, "");
-    const [response, link] = safeLink.split("|");
-    return {
-      isDone: response.startsWith('---'),
-      response: response.replace(/^---\s*/, ''),
-      link: link ?? response,
-    };
-  });
+  return responses.map(parseResponse);
 };
 
-twine_lua_parser.extractPropsFromText = (dict) => {
+const extractPropsFromText = (dict) => {
   const props = {};
   const setRegexPattern = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/g;
 
   dict.text = dict.text.replace(
     setRegexPattern,
     (match, variableName, variableValue) => {
-      props[variableName] = variableValue;
+      props[variableName] = JSON.parse(variableValue);
       return ""; // Replace the match with an empty string
     }
   );
@@ -68,20 +71,20 @@ twine_lua_parser.extractPropsFromText = (dict) => {
   return Object.keys(props).length > 0 ? props : null;
 };
 
-twine_lua_parser.convertPassage = (passage) => {
+const convertPassage = (passage) => {
   const dict = { text: passage.innerHTML };
 
-  const responses = twine_lua_parser.extractResponsesFromText(dict);
+  const responses = extractResponsesFromText(dict);
   if (responses) {
     dict.responses = responses;
   }
 
-  const props = twine_lua_parser.extractPropsFromText(dict);
+  const props = extractPropsFromText(dict);
   if (props) {
     dict.props = props;
   }
 
-  ["name", "pid", "tags"].forEach((attr) => {
+  ["name", "tags"].forEach((attr) => {
     const value = passage.attributes[attr].value;
     if (value) {
       dict[attr] = value;
@@ -89,37 +92,36 @@ twine_lua_parser.convertPassage = (passage) => {
   });
 
   if (dict.tags) dict.tags = dict.tags.split(" ");
-  
+
   // remove all trailing \n
-  dict.text = dict.text.replace(/\s+$/g, '')
+  dict.text = dict.text.replace(/\s+$/g, "");
 
   return dict;
 };
 
-twine_lua_parser.convertStory = (story) => {
+const convertStory = (story) => {
   const passages = story.getElementsByTagName("tw-passagedata");
   const convertedPassages = Array.prototype.slice
     .call(passages)
-    .map(twine_lua_parser.convertPassage);
+    .map(convertPassage);
 
-  const dict = { passages: convertedPassages };
+  const dict = {
+    passages: {},
+    name: story.attributes.name.value,
+    startnode: story.attributes.startnode.value,
+  };
 
-  ["name", "startnode"].forEach((attr) => {
-    const value = story.attributes[attr].value;
-    if (value) {
-      dict[attr] = value;
-    }
+  convertedPassages.forEach((row) => {
+    dict.passages[row.name] = { ...row, name: undefined };
   });
 
   return JSON.parse(JSON.stringify(dict));
 };
 
-twine_lua_parser.init = () => {
+const parseTwineToLua = () => {
   const storyData = document.getElementsByTagName("tw-storydata")[0];
-  const response = convertToLuaScript(twine_lua_parser.convertStory(storyData));
+  const response = convertToLuaScript(convertStory(storyData));
   document.getElementById("output").innerHTML = response;
 };
 
-if (typeof window !== "undefined") window.twine_lua_parser = twine_lua_parser;
-
-export { twine_lua_parser };
+window.parseTwineToLua = parseTwineToLua;

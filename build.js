@@ -7,7 +7,7 @@ let html = fs.readFileSync("src/storyFormat.html", "utf-8");
 html = html.replace("{{SCRIPT}}", js);
 
 const outputJSON = {
-  name: pkg.name,
+  name: "Twine to Lua parser",
   version: pkg.version,
   author: pkg.author,
   description: pkg.description,
