@@ -29,14 +29,14 @@ const convertToLuaScript = (data) => {
   return `return ${parseValueAsLuaObject(data)}`;
 };
 
-const parseResponse = (text) => {
-  const safeLink = text.replace(/^\[+|\]+$/g, "");
-  const [response, link] = safeLink.split("|");
+const parseResponse = (unparsedText) => {
+  const safeLink = unparsedText.replace(/^\[+|\]+$/g, "");
+  const [text, link] = safeLink.split("|");
   const toReturn = {
-    response: response.replace(/^---\s*/, ""),
-    link: link ?? response,
+    text: text.replace(/^---\s*/, ""),
+    link: link ?? text,
   };
-  if (response.startsWith("---")) {
+  if (text.startsWith("---")) {
     toReturn.isEnd = true;
   }
   return toReturn;
