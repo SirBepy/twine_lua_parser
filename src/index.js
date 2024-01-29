@@ -1,3 +1,10 @@
+const REGEX_CONDITION = /\?\((\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
+const REGEX_PROPS = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/;
+
+const decodeHtmlEntities = (text) => {
+  return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+};
+
 const parseValueAsLuaObject = (value) => {
   const valueType = typeof value;
   if (value === null) return null;
@@ -11,9 +18,7 @@ const parseValueAsLuaObject = (value) => {
     case "boolean":
       return value.toString();
     case "string":
-      return JSON.stringify(value)
-        .replace(/\\n\s+/g, "\\n")
-        .replace(/\s+\\n/g, "\\n");
+      return JSON.stringify(value);
     case "object": {
       const properties = Object.entries(value)
         .map(([key, val]) => `${key} = ${parseValueAsLuaObject(val)}`)
@@ -29,53 +34,117 @@ const convertToLuaScript = (data) => {
   return `return ${parseValueAsLuaObject(data)}`;
 };
 
-const parseResponse = (unparsedText) => {
-  const safeLink = unparsedText.replace(/^\[+|\]+$/g, "");
-  const [text, link] = safeLink.split("|");
-  const toReturn = {
-    text: text.replace(/^---\s*/, ""),
-    link: link ?? text,
-  };
-  if (text.startsWith("---")) {
-    toReturn.isEnd = true;
+const getCondition = (text) => {
+  const match = text.match(REGEX_CONDITION);
+  if (!match) return;
+  let [_, varName, comparator, value] = match;
+  switch (comparator) {
+    case "==":
+      comparator = "eq";
+      break;
+    case ">":
+      comparator = "gt";
+      value = parseFloat(value);
+      break;
+    case "<":
+      comparator = "lt";
+      value = parseFloat(value);
+      break;
   }
+  return { varName, comparator, value };
+};
+
+const parseResponse = (unparsedText) => {
+  const safeLink = unparsedText.replace(/^!*\[\[|\]\]!*$/g, "");
+  const splitLink = safeLink.split("|");
+  const toReturn = {};
+  if (splitLink.length == 1) toReturn.link = splitLink[0];
+
+  const condition = getCondition(splitLink[0]);
+  if (condition) toReturn.condition = condition;
+
+  if (splitLink.length == 2) {
+    toReturn.link = splitLink[1];
+    if (!condition) {
+      toReturn.text = splitLink[0];
+    }
+  } else if (splitLink.length == 3) {
+    toReturn.link = splitLink[2];
+    toReturn.text = splitLink[1];
+  }
+
+  if (toReturn.text?.startsWith("---")) {
+    toReturn.isEnd = true;
+    toReturn.text = toReturn.text.replace(/^---/, "");
+    if (!toReturn.text) delete toReturn.text
+  }
+  if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
+    toReturn.isUrgent = true;
+  }
+
   return toReturn;
 };
 
-const extractResponsesFromText = (dict) => {
-  const text = dict.text;
-  const responses = text.match(/\[\[.+?\]\]/g);
-  if (!responses) return null;
+const extractResponsesFromText = (texts) => {
+  const responses = [];
 
-  dict.text = dict.text.replace(/\[\[.*?\]\]/g, ""); // remove all [[]]
+  for (let i = texts.length - 1; i >= 0; i--) {
+    const currentString = texts[i];
+    const matches = currentString.match(/!*\[\[.+?\]\]!*/g);
+
+    if (matches) {
+      responses.push(matches[0]);
+      texts.splice(i, 1);
+    }
+  }
+
+  if (responses.length == 0) return;
 
   return responses.map(parseResponse);
 };
 
-const extractPropsFromText = (dict) => {
+const extractPropsFromText = (texts) => {
   const props = {};
-  const setRegexPattern = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/g;
 
-  dict.text = dict.text.replace(
-    setRegexPattern,
-    (match, variableName, variableValue) => {
-      props[variableName] = JSON.parse(variableValue);
-      return ""; // Replace the match with an empty string
+  for (let i = texts.length - 1; i >= 0; i--) {
+    const currentString = texts[i];
+    const match = currentString.match(REGEX_PROPS);
+
+    if (match) {
+      const [_, varName, value] = match;
+      props[varName] = JSON.parse(value);
+      texts.splice(i, 1);
     }
-  );
-
-  dict.text = dict.text.trim();
+  }
 
   return Object.keys(props).length > 0 ? props : null;
 };
 
+const cleanLinesArray = (texts) => {
+  return texts
+    .map((text) => decodeHtmlEntities(text).trim())
+    .filter((text) => !!text);
+};
+
+const parseLines = (line) => {
+  const condition = getCondition(line);
+  if (!condition) return { text: line };
+  return { text: line.replace(REGEX_CONDITION, ''), condition };
+};
+
 const convertPassage = (passage) => {
-  const dict = { text: passage.innerHTML };
+  const lines = cleanLinesArray(passage.innerHTML.split("\n"));
+  const dict = {};
 
-  const responses = extractResponsesFromText(dict);
-  if (responses) dict.responses = responses;
+  const responses = extractResponsesFromText(lines);
+  if (responses) {
+    dict.responses = responses.filter(response => !!response.text);
+    dict.redirects = responses.filter(response => !response.text);
+    if(!dict.responses.length) delete dict.responses
+    if(!dict.redirects.length) delete dict.redirects
+  }
 
-  const props = extractPropsFromText(dict);
+  const props = extractPropsFromText(lines);
   if (props) dict.props = props;
 
   ["name", "tags", "pid"].forEach((attr) => {
@@ -84,7 +153,7 @@ const convertPassage = (passage) => {
   });
 
   if (dict.tags) dict.tags = dict.tags.split(" ");
-  dict.text = dict.text.replace(/\s+$/g, ""); // remove all trailing \n
+  dict.lines = cleanLinesArray(lines).map(parseLines);
 
   return dict;
 };
@@ -98,7 +167,9 @@ const convertStory = (story) => {
   const dict = {
     passages: {},
     name: story.attributes.name.value,
-    start_node_name: convertedPassages.find(passage => passage.pid == story.attributes.startnode.value).name
+    start_node_name: convertedPassages.find(
+      (passage) => passage.pid == story.attributes.startnode.value
+    ).name,
   };
 
   convertedPassages.forEach((row) => {

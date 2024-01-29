@@ -1,8 +1,10 @@
-<tw-storydata name="HT - Butler" startnode="1" creator="Twine" creator-version="2.8.1" format="Snowman" format-version="2.0.2" ifid="98D0DC64-2DEB-4BD8-B482-98DFB0DEFD5D" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="tutorial_100" tags="" position="700,400" size="100,100">HALT!
+<tw-storydata name="Maxwell" startnode="1" creator="Twine" creator-version="2.8.1" format="Twine to Lua parser" format-version="0.0.7" ifid="98D0DC64-2DEB-4BD8-B482-98DFB0DEFD5D" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="tutorial_100" tags="" position="700,400" size="100,100">HALT!
+  ?(age == 5) Oh, you are 5 years old?
   ...
-  Okay, I think youre good to go.
-  Why are you here?
+  Okay, I think youre good to go, but why are you here?
   
+  
+  [[Youre stupid!|youre_stupid]]
   [[I&#39;m not sure|tutorial_101]]
   [[Why should I answer you?|tutorial_102]]
   
@@ -19,7 +21,8 @@
   
   [[Do you need any help?|tutorial_110]]</tw-passagedata><tw-passagedata pid="5" name="tutorial_102" tags="" position="800,550" size="100,100">This castle is important to me, I&#39;m not just going to let some nobody enter without explaining themselves
   
-  [[Do you need any help?|tutorial_110]]</tw-passagedata><tw-passagedata pid="6" name="tutorial_110" tags="" position="700,700" size="100,100">?
+  [[Do you need any help?|tutorial_110]]
+  </tw-passagedata><tw-passagedata pid="6" name="tutorial_110" tags="" position="700,700" size="100,100">?
   Well, actually, yeah
   I can see your staff, so youre a wizzard...
   Do you mind cleaning this place up a little bit?
@@ -29,7 +32,7 @@
   For now just go onto the fountain
   
   [[---Okay|tutorial_200]]
-  $highlight = &quot;tutorial_1&quot;</tw-passagedata><tw-passagedata pid="8" name="tutorial_300" tags="" position="1500,400" size="100,100">That was pretty good
+  $highlight = &quot;fountain&quot;</tw-passagedata><tw-passagedata pid="8" name="tutorial_300" tags="" position="1500,400" size="100,100">That was pretty good
   
   [[How did I do that?|tutorial_310]]</tw-passagedata><tw-passagedata pid="9" name="tutorial_310" tags="" position="1500,550" size="100,100">Well
   Your staff collected our EP (Ectoplasm)
@@ -38,11 +41,22 @@
   [[Okay, thanks! Bye|tutorial_320]]</tw-passagedata><tw-passagedata pid="10" name="tutorial_120" tags="" position="900,750" size="100,100">That doesnt matter right now
   
   [[How can I trust you if I dont know who you are?|tutorial_130]]
-  [[How do I &quot;clean up&quot;?|tutorial_150]]</tw-passagedata><tw-passagedata pid="11" name="tutorial_130" tags="" position="900,900" size="100,100">Ugh
+  [[How do I &quot;clean up&quot;?|tutorial_150]]
+  
+  $shakeCamera = &quot;true&quot;</tw-passagedata><tw-passagedata pid="11" name="tutorial_130" tags="" position="900,900" size="100,100">Ugh
   I&#39;m a ghost
   I used to live here
   Well...
   I used to protect this area...
   I&#39;m the main butler around here
   
-  [[Okay, sorry. How do I &quot;clean up&quot; as you said?|tutorial_150]]</tw-passagedata><tw-passagedata pid="12" name="tutorial_320" tags="" position="1500,700" size="100,100">Bye</tw-passagedata></tw-storydata>
+  [[Okay, sorry. How do I &quot;clean up&quot; as you said?|tutorial_150]]
+  
+  
+  $shakeCamera = &quot;false&quot;</tw-passagedata><tw-passagedata pid="12" name="tutorial_320" tags="" position="1500,700" size="100,100">Bye</tw-passagedata><tw-passagedata pid="13" name="youre_stupid" tags="" position="425,575" size="100,100">Thats rude...
+  
+  ![[?(hat == &quot;urgent&quot;)|urgent_redirect]]!
+  [[?(hat == &quot;redirect&quot;)|redirect_after_text]]
+  [[?(age &gt; 50)|redirect_after_text_number]]
+  [[?(age &lt; 50)|An optional response|optional_response]]
+  [[Oh, sorry about that|default_response]]</tw-passagedata><tw-passagedata pid="14" name="urgent_redirect" tags="" position="275,700" size="100,100">Urgent Redirect!</tw-passagedata><tw-passagedata pid="15" name="redirect_after_text" tags="" position="300,825" size="100,100">Redirect after text</tw-passagedata><tw-passagedata pid="16" name="redirect_after_text_number" tags="" position="425,700" size="100,100">Redirect after the text (with number)</tw-passagedata><tw-passagedata pid="17" name="optional_response" tags="" position="550,700" size="100,100">Optional Response</tw-passagedata><tw-passagedata pid="18" name="default_response" tags="" position="500,825" size="100,100">This is the default response</tw-passagedata></tw-storydata>
