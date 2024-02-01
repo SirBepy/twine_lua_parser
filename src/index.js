@@ -38,7 +38,9 @@ const convertToLuaScript = (data) => {
 const getCondition = (text) => {
   const match = text.match(REGEX_CONDITION);
   if (!match) return;
-  let [_, varName, comparator, value] = match;
+  let [_, fullVarName, comparator, value] = match;
+  const [varName, category] = fullVarName.split('.')
+
   switch (comparator) {
     case "==":
       comparator = "eq";
@@ -52,7 +54,7 @@ const getCondition = (text) => {
       value = parseFloat(value);
       break;
   }
-  return { varName, comparator, value };
+  return { varName, category: category ?? 'checks', comparator, value };
 };
 
 const parseResponse = (unparsedText) => {
@@ -112,9 +114,11 @@ const extractPropsFromText = (texts) => {
     const match = currentString.match(REGEX_PROPS);
 
     if (match) {
-      const [_, varName, value] = match;
-      props.push({ varName, value: JSON.parse(value) });
+      const [_, fullVarName, value] = match;
+      const [varName, category] = fullVarName
+      const prop = { varName, value: JSON.parse(value), category: category ?? 'checks' }
 
+      props.push(prop);
       texts.splice(i, 1);
     }
   }
