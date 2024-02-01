@@ -1,5 +1,5 @@
-const REGEX_CONDITION = /\?\((\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
-const REGEX_PROPS = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/;
+const REGEX_CONDITION = /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
+const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g
 
 const decodeHtmlEntities = (text) => {
@@ -38,8 +38,7 @@ const convertToLuaScript = (data) => {
 const getCondition = (text) => {
   const match = text.match(REGEX_CONDITION);
   if (!match) return;
-  let [_, fullVarName, comparator, value] = match;
-  const [varName, category] = fullVarName.split('.')
+  let [_, category, varName, comparator, value] = match;
 
   switch (comparator) {
     case "==":
@@ -47,13 +46,16 @@ const getCondition = (text) => {
       break;
     case ">":
       comparator = "gt";
-      value = parseFloat(value);
+      // value = parseFloat(value);
       break;
     case "<":
       comparator = "lt";
-      value = parseFloat(value);
+      // value = parseFloat(value);
       break;
   }
+  try {
+    value = JSON.parse(value)
+  } catch (error) { }
   return { varName, category: category ?? 'checks', comparator, value };
 };
 
@@ -114,9 +116,13 @@ const extractPropsFromText = (texts) => {
     const match = currentString.match(REGEX_PROPS);
 
     if (match) {
-      const [_, fullVarName, value] = match;
-      const [varName, category] = fullVarName.split('.')
-      const prop = { varName, value: JSON.parse(value), category: category ?? 'checks' }
+      const [_, category, varName, value] = match;
+      const prop = { varName, category: category ?? 'checks' }
+      try {
+        prop.value = JSON.parse(value)
+      } catch (error) {
+        prop.value = value
+      }
 
       props.push(prop);
       texts.splice(i, 1);
