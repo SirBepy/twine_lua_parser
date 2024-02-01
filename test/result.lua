@@ -6,18 +6,18 @@ return {
                 {link = 'tutorial_101', text = "I'm not sure"},
                 {link = 'youre_stupid', text = 'Youre stupid!'}
             },
-            props = {tutorial = 1},
+            props = {{varName = 'tutorial', value = 1}},
             lines = {
-                {text = 'HALT!'},
+                {text = 'HALT! ', emotion = 'angry'},
                 {text = ' Oh, you are 5 years old?', condition = {varName = 'age', comparator = 'eq', value = '5'}},
                 {text = '...'},
-                {text = 'Okay, I think youre good to go, but why are you here?'}
+                {text = 'Okay, I think youre good to go, but why are you here?', emotion = 'sad'}
             }
         },
         Greeting = {lines = {{text = 'Hey'}, {text = 'What do you want?'}}},
         tutorial_200 = {
             redirects = {{link = 'tutorial_300', isEnd = true}},
-            props = {highlight = 'tutorial_2'},
+            props = {{varName = 'highlight', value = 'tutorial_2'}},
             lines = {
                 {text = 'Your staff just got some magic in it'},
                 {text = 'Try using it to fix this pillar over here.'}
@@ -49,7 +49,7 @@ return {
         },
         tutorial_150 = {
             responses = {{link = 'tutorial_200', text = 'Okay', isEnd = true}},
-            props = {highlight = 'fountain'},
+            props = {{varName = 'highlight', value = 'fountain'}},
             lines = {{text = 'Hmm, okay...'}, {text = 'For now just go onto the fountain'}}
         },
         tutorial_300 = {
@@ -69,12 +69,12 @@ return {
                 {link = 'tutorial_150', text = 'How do I "clean up"?'},
                 {link = 'tutorial_130', text = 'How can I trust you if I dont know who you are?'}
             },
-            props = {shakeCamera = 'true'},
+            props = {{varName = 'shakeCamera', value = 'true'}},
             lines = {{text = 'That doesnt matter right now'}}
         },
         tutorial_130 = {
             responses = {{link = 'tutorial_150', text = 'Okay, sorry. How do I "clean up" as you said?'}},
-            props = {shakeCamera = 'false'},
+            props = {{varName = 'shakeCamera', value = 'false'}},
             lines = {
                 {text = 'Ugh'},
                 {text = "I'm a ghost"},
@@ -103,11 +103,13 @@ return {
                     isUrgent = true
                 }
             },
-            lines = {{text = 'Thats rude...'}}
+            lines = {{text = 'First line'}, {text = 'Second line'}}
         },
-        urgent_redirect = {lines = {{text = 'Urgent Redirect!'}}},
-        redirect_after_text = {lines = {{text = 'Redirect after text'}}},
-        redirect_after_text_number = {lines = {{text = 'Redirect after the text (with number)'}}},
+        urgent_redirect = {lines = {{text = 'First redirect line (urgent!)'}, {text = 'Second redirect line'}}},
+        redirect_after_text = {lines = {{text = 'First redirect line (After text)'}, {text = 'Second redirect line'}}},
+        redirect_after_text_number = {
+            lines = {{text = 'First redirect line (After tex with number)'}, {text = 'Second redirect line'}}
+        },
         optional_response = {lines = {{text = 'Optional Response'}}},
         default_response = {lines = {{text = 'This is the default response'}}}
     },

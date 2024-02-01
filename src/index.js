@@ -1,5 +1,6 @@
 const REGEX_CONDITION = /\?\((\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS = /\$([\w\d]+)\s*=\s*("[^"]+"|\d+)/;
+const REGEX_EMOTION = /\{\{.+?\}\}/g
 
 const decodeHtmlEntities = (text) => {
   return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
@@ -76,7 +77,7 @@ const parseResponse = (unparsedText) => {
   if (toReturn.text?.startsWith("---")) {
     toReturn.isEnd = true;
     toReturn.text = toReturn.text.replace(/^---/, "");
-    if (!toReturn.text) delete toReturn.text
+    if (!toReturn.text) delete toReturn.text;
   }
   if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
     toReturn.isUrgent = true;
@@ -127,10 +128,15 @@ const cleanLinesArray = (texts) => {
     .filter((text) => !!text);
 };
 
-const parseLines = (line) => {
+const parseLine = (line) => {
+  const toReturnLine = { text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "") }
   const condition = getCondition(line);
-  if (!condition) return { text: line };
-  return { text: line.replace(REGEX_CONDITION, ''), condition };
+  const emotion = line.match(REGEX_EMOTION);
+
+  if (condition) toReturnLine.condition = condition;
+  if (emotion) toReturnLine.emotion = emotion[0].replace(/^\{\{|\}\}$/g, "");
+
+  return toReturnLine;
 };
 
 const convertPassage = (passage) => {
@@ -139,10 +145,10 @@ const convertPassage = (passage) => {
 
   const responses = extractResponsesFromText(lines);
   if (responses) {
-    dict.responses = responses.filter(response => !!response.text);
-    dict.redirects = responses.filter(response => !response.text);
-    if(!dict.responses.length) delete dict.responses
-    if(!dict.redirects.length) delete dict.redirects
+    dict.responses = responses.filter((response) => !!response.text);
+    dict.redirects = responses.filter((response) => !response.text);
+    if (!dict.responses.length) delete dict.responses;
+    if (!dict.redirects.length) delete dict.redirects;
   }
 
   const props = extractPropsFromText(lines);
@@ -154,7 +160,7 @@ const convertPassage = (passage) => {
   });
 
   if (dict.tags) dict.tags = dict.tags.split(" ");
-  dict.lines = cleanLinesArray(lines).map(parseLines);
+  dict.lines = cleanLinesArray(lines).map(parseLine);
 
   return dict;
 };
