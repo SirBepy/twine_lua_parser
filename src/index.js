@@ -104,7 +104,7 @@ const extractResponsesFromText = (texts) => {
 };
 
 const extractPropsFromText = (texts) => {
-  const props = {};
+  const props = [];
 
   for (let i = texts.length - 1; i >= 0; i--) {
     const currentString = texts[i];
@@ -112,7 +112,8 @@ const extractPropsFromText = (texts) => {
 
     if (match) {
       const [_, varName, value] = match;
-      props[varName] = JSON.parse(value);
+      props.push({ varName, value: JSON.parse(value) });
+
       texts.splice(i, 1);
     }
   }
