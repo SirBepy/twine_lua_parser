@@ -115,7 +115,7 @@ const extractPropsFromText = (texts) => {
 
     if (match) {
       const [_, fullVarName, value] = match;
-      const [varName, category] = fullVarName
+      const [varName, category] = fullVarName.split('.')
       const prop = { varName, value: JSON.parse(value), category: category ?? 'checks' }
 
       props.push(prop);
