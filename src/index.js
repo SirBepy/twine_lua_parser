@@ -1,6 +1,7 @@
-const REGEX_CONDITION = /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
+const REGEX_CONDITION =
+  /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
-const REGEX_EMOTION = /\{\{.+?\}\}/g
+const REGEX_EMOTION = /\{\{.+?\}\}/g;
 
 const decodeHtmlEntities = (text) => {
   return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
@@ -54,12 +55,12 @@ const getCondition = (text) => {
       break;
   }
   try {
-    value = JSON.parse(value)
-  } catch (error) { }
-  return { varName, category: category ?? 'checks', comparator, value };
+    value = JSON.parse(value);
+  } catch (error) {}
+  return { varName, category: category ?? "checks", comparator, value };
 };
 
-const parseResponse = (unparsedText) => {
+const parseResponse = ({ unparsedText, emotion }) => {
   const safeLink = unparsedText.replace(/^!*\[\[|\]\]!*$/g, "");
   const splitLink = safeLink.split("|");
   const toReturn = {};
@@ -86,6 +87,7 @@ const parseResponse = (unparsedText) => {
   if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
     toReturn.isUrgent = true;
   }
+  if (emotion) toReturn.emotion = emotion;
 
   return toReturn;
 };
@@ -95,10 +97,15 @@ const extractResponsesFromText = (texts) => {
 
   for (let i = texts.length - 1; i >= 0; i--) {
     const currentString = texts[i];
-    const matches = currentString.match(/!*\[\[.+?\]\]!*/g);
+    const responseMatches = currentString.match(/!*\[\[.+?\]\]!*/g);
+    const emotionMatches = currentString.match(REGEX_EMOTION);
 
-    if (matches) {
-      responses.push(matches[0]);
+    if (responseMatches) {
+      const newResponse = { unparsedText: responseMatches[0] };
+      if (emotionMatches) {
+        newResponse.emotion = emotionMatches[0].replace(/^\{\{|\}\}$/g, "");
+      }
+      responses.push(newResponse);
       texts.splice(i, 1);
     }
   }
@@ -117,11 +124,11 @@ const extractPropsFromText = (texts) => {
 
     if (match) {
       const [_, category, varName, value] = match;
-      const prop = { varName, category: category ?? 'checks' }
+      const prop = { varName, category: category ?? "checks" };
       try {
-        prop.value = JSON.parse(value)
+        prop.value = JSON.parse(value);
       } catch (error) {
-        prop.value = value
+        prop.value = value;
       }
 
       props.push(prop);
@@ -139,7 +146,9 @@ const cleanLinesArray = (texts) => {
 };
 
 const parseLine = (line) => {
-  const toReturnLine = { text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "") }
+  const toReturnLine = {
+    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, ""),
+  };
   const condition = getCondition(line);
   const emotion = line.match(REGEX_EMOTION);
 

@@ -128,8 +128,28 @@ return {
             lines = {{text = 'First redirect line (After tex with number)'}, {text = 'Second redirect line'}}
         },
         optional_response = {lines = {{text = 'Optional Response'}}},
-        default_response = {lines = {{text = 'This is the default response'}}}
+        default_response = {lines = {{text = 'This is the default response'}}},
+        quick_test = {
+            responses = {
+                {link = 'shocked_response', text = 'Boo', emotion = 'Shocked'},
+                {link = 'happy_response', text = 'You look cute', emotion = 'Happy'},
+                {link = 'angry_response', text = 'I stole your wallet', emotion = 'Angry'},
+                {link = 'sad_response', text = 'Youre ugly', emotion = 'Sad'}
+            },
+            lines = {{text = 'Hi!'}, {text = 'Who are you?'}}
+        },
+        angry_response = {responses = {{link = 'bye', text = 'Bye'}}, lines = {{text = 'NO! ', emotion = 'Angry'}}},
+        sad_response = {
+            responses = {{link = 'bye', text = 'Bye'}},
+            lines = {{text = 'Thats very mean of you ', emotion = 'Sad'}}
+        },
+        happy_response = {
+            responses = {{link = 'bye', text = 'Bye'}},
+            lines = {{text = 'Aww, thank you! ', emotion = 'Happy'}, {text = 'Thats very kind of you!'}}
+        },
+        shocked_response = {responses = {{link = 'bye', text = 'Bye'}}, lines = {{text = 'WAA ', emotion = 'Shocked'}}},
+        bye = {lines = {{text = 'Bye ', emotion = 'Default'}}}
     },
     name = 'Maxwell',
-    start_node_name = 'tutorial_100'
+    start_node_name = 'quick_test'
 }
