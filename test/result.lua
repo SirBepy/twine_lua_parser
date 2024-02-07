@@ -2,9 +2,9 @@ return {
     passages = {
         tutorial_100 = {
             responses = {
-                {link = 'tutorial_102', text = 'Why should I answer you?'},
+                {link = 'youre_stupid', text = 'Youre stupid!'},
                 {link = 'tutorial_101', text = "I'm not sure"},
-                {link = 'youre_stupid', text = 'Youre stupid!'}
+                {link = 'tutorial_102', text = 'Why should I answer you?'}
             },
             props = {{varName = 'tutorial', category = 'checks', value = 1}},
             lines = {
@@ -40,8 +40,8 @@ return {
         },
         tutorial_110 = {
             responses = {
-                {link = 'tutorial_120', text = 'Who am I talking to?'},
-                {link = 'tutorial_150', text = 'Sure, but actually... how do i do that?'}
+                {link = 'tutorial_150', text = 'Sure, but actually... how do i do that?'},
+                {link = 'tutorial_120', text = 'Who am I talking to?'}
             },
             props = {{varName = 'staff', category = 'inventory', value = true}},
             lines = {
@@ -70,8 +70,8 @@ return {
         },
         tutorial_120 = {
             responses = {
-                {link = 'tutorial_150', text = 'How do I "clean up"?'},
-                {link = 'tutorial_130', text = 'How can I trust you if I dont know who you are?'}
+                {link = 'tutorial_130', text = 'How can I trust you if I dont know who you are?'},
+                {link = 'tutorial_150', text = 'How do I "clean up"?'}
             },
             props = {{varName = 'shakeCamera', category = 'checks', value = 'true'}},
             lines = {{text = 'That doesnt matter right now'}}
@@ -91,26 +91,26 @@ return {
         tutorial_320 = {lines = {{text = 'Bye'}}},
         youre_stupid = {
             responses = {
-                {link = 'default_response', text = 'Oh, sorry about that'},
                 {
                     condition = {varName = 'age', category = 'checks', comparator = 'lt', value = 50},
                     link = 'optional_response',
                     text = 'An optional response'
-                }
+                },
+                {link = 'default_response', text = 'Oh, sorry about that'}
             },
             redirects = {
                 {
-                    condition = {varName = 'age', category = 'checks', comparator = 'gt', value = 50},
-                    link = 'redirect_after_text_number'
+                    condition = {varName = 'hat', category = 'checks', comparator = 'eq', value = 'urgent'},
+                    link = 'urgent_redirect',
+                    isUrgent = true
                 },
                 {
                     condition = {varName = 'hat', category = 'checks', comparator = 'eq', value = 'redirect'},
                     link = 'redirect_after_text'
                 },
                 {
-                    condition = {varName = 'hat', category = 'checks', comparator = 'eq', value = 'urgent'},
-                    link = 'urgent_redirect',
-                    isUrgent = true
+                    condition = {varName = 'age', category = 'checks', comparator = 'gt', value = 50},
+                    link = 'redirect_after_text_number'
                 }
             },
             lines = {
@@ -122,19 +122,19 @@ return {
                 {text = 'Second line'}
             }
         },
-        urgent_redirect = {lines = {{text = 'First redirect line (urgent!)'}, {text = 'Second redirect line'}}},
         redirect_after_text = {lines = {{text = 'First redirect line (After text)'}, {text = 'Second redirect line'}}},
         redirect_after_text_number = {
             lines = {{text = 'First redirect line (After tex with number)'}, {text = 'Second redirect line'}}
         },
+        urgent_redirect = {lines = {{text = 'First redirect line (urgent!)'}, {text = 'Second redirect line'}}},
         optional_response = {lines = {{text = 'Optional Response'}}},
         default_response = {lines = {{text = 'This is the default response'}}},
         quick_test = {
             responses = {
-                {link = 'shocked_response', text = 'Boo', emotion = 'Shocked'},
-                {link = 'happy_response', text = 'You look cute', emotion = 'Happy'},
+                {link = 'sad_response', text = 'Youre ugly', emotion = 'Sad'},
                 {link = 'angry_response', text = 'I stole your wallet', emotion = 'Angry'},
-                {link = 'sad_response', text = 'Youre ugly', emotion = 'Sad'}
+                {link = 'happy_response', text = 'You look cute', emotion = 'Happy'},
+                {link = 'shocked_response', text = 'Boo', emotion = 'Shocked'}
             },
             lines = {{text = 'Hi!'}, {text = 'Who are you?'}}
         },

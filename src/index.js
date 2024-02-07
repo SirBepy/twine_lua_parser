@@ -105,14 +105,14 @@ const extractResponsesFromText = (texts) => {
       if (emotionMatches) {
         newResponse.emotion = emotionMatches[0].replace(/^\{\{|\}\}$/g, "");
       }
-      responses.push(newResponse);
+      responses.unshift(newResponse);
       texts.splice(i, 1);
     }
   }
 
   if (responses.length == 0) return;
 
-  return responses.map(parseResponse);
+  return responses.map(parseResponse).sort(response => response.isUrgent ? 1 : 0);
 };
 
 const extractPropsFromText = (texts) => {
