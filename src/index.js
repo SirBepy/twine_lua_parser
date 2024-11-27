@@ -2,7 +2,7 @@ const REGEX_CONDITION =
   /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
-const REGEX_NAME = /^@(\w+):\s*(.+)$/;
+const REGEX_NAME = /^@(\w+):/;
 
 const decodeHtmlEntities = (text) => {
   return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
@@ -148,7 +148,7 @@ const cleanLinesArray = (texts) => {
 
 const parseLine = (line) => {
   const toReturnLine = {
-    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "").replace(REGEX_NAME, ""),
+    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "").replace(REGEX_NAME, "").trim(),
   };
   const condition = getCondition(line);
   const emotion = line.match(REGEX_EMOTION);
