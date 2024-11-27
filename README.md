@@ -10,9 +10,9 @@ From the Twine home screen:
 
 1. Go to **Twine** ➔ **Story Formats** ➔ **Add**.
 2. Paste the following URL:
-   +++
+   ```
    https://sirbepy.github.io/twine_lua_parser/dist/format.js
-   +++
+   ```
 
 ## Input Notation
 
@@ -20,59 +20,59 @@ From the Twine home screen:
 
 - **Character Names**: Use `@Name:` at the beginning of a line to specify the speaker.
 
-   +++
+   ```
    @Bob: Hello there!
    @George: Hi, Bob!
-   +++
+   ```
 
 - **Emotions**: Wrap emotions in `{{` and `}}` within the line.
 
-   +++
+   ```
    @Bob: I'm feeling great! {{happy}}
-   +++
+   ```
 
 - **Conditions**: Use `?($category.varName == value)` to display a line only if the condition is met.
 
-   +++
+   ```
    ?($checks.hasKey == true) @George: You found the key!
-   +++
+   ```
 
 ### Responses and Links
 
 - **Clickable Responses**: Use standard Twine link notation.
 
-   +++
+   ```
    [[Yes|affirmative_response]]
    [[No|negative_response]]
-   +++
+   ```
 
 - **Urgent Responses**: Wrap the link with exclamation marks to prioritize.
 
-   +++
+   ```
    ![[This is urgent|urgent_response]]!
-   +++
+   ```
 
 - **End Links**: Prefix the link text with `---` to indicate a non-interactive transition.
 
-   +++
+   ```
    [[---|next_passage]]
    [[---Proceed|next_passage]]
-   +++
+   ```
 
 ### Props and Variables
 
 - **Set Props**: Use `$category.varName = value` to set properties.
 
-   +++
+   ```
    $highlight = "tutorial_1"
    $stats.health = 100
-   +++
+   ```
 
 ## Output Format
 
 The parser converts your Twine story into a Lua table:
 
-   +++
+   ```
    return {
        passages = {
            passage_name = {
@@ -95,7 +95,7 @@ The parser converts your Twine story into a Lua table:
        name = "My Twine Story",
        start_node_name = "start_passage"
    }
-   +++
+   ```
 
 ## Features
 
@@ -110,7 +110,7 @@ The parser converts your Twine story into a Lua table:
 
 ### Twine Input
 
-   +++
+   ```
    @Bob: Welcome to the adventure! {{excited}}
    $highlight = "intro"
    ?($stats.level > 1) @Bob: I see you're experienced.
@@ -118,11 +118,11 @@ The parser converts your Twine story into a Lua table:
    [[Start Quest|quest_start]]
    ![[Visit Shop|shop]]!
    [[---|next_passage]]
-   +++
+   ```
 
 ### Lua Output
 
-   +++
+   ```
    return {
        passages = {
            start_passage = {
@@ -145,7 +145,7 @@ The parser converts your Twine story into a Lua table:
        name = "Adventure Story",
        start_node_name = "start_passage"
    }
-   +++
+   ```
 
 ## Development
 
@@ -153,13 +153,13 @@ To work on `twine_lua_parser`:
 
 1. Clone the repository.
 2. Install dependencies:
-   +++
+   ```
    npm install
-   +++
+   ```
 3. Start the development server:
-   +++
+   ```
    npm start
-   +++
+   ```
 
 ## Notes
 
