@@ -2,107 +2,167 @@
 
 ![Build Status](https://github.com/sirbepy/twine_lua_parser/workflows/Build/badge.svg)
 
-twine_lua_parser story format for [Twine 2](http://twinery.org/2) that exports the data to a lua format.
-
-It is heavily inspired by [Twison](https://github.com/lazerwalker/twison)
+A Twine 2 story format that exports data to a Lua format. Inspired by [Twison](https://github.com/lazerwalker/twison).
 
 ## Installation
 
-From the Twine home screen, go into Twine -> Story Formats -> Add
-Then paste the following
-`https://sirbepy.github.io/twine_lua_parser/dist/format.js`.
+From the Twine home screen:
 
-## Input
+1. Go to **Twine** ➔ **Story Formats** ➔ **Add**.
+2. Paste the following URL:
+   +++
+   https://sirbepy.github.io/twine_lua_parser/dist/format.js
+   +++
 
-To set props just do
-```
-$foo = bar
-```
+## Input Notation
 
-To link, use the standard approach.
-```
-[[link_id]] // This will lead you to the passage with that link_id
-[[Hey!|link_id]] // This will respond by saying "Hey!", but still lead you to the passage with link_id
-```
-Extra:
-I like to link what the next conversation will be. This means that although I'm pointing to another passage, I dont want to run it now, but I like having the arrow in Twine pointing to where the user will continue off of. You can accomplish that by adding "---" to the start of your link like this.
-```
-[[---|link_id]]
-[[---Hey!|link_id]]
-```
-As you can see, you can still provide a response, but its optional. Maybe you want to point to the next conversation without having your character say anything.
+### Dialogue Lines
 
+- **Character Names**: Use `@Name:` at the beginning of a line to specify the speaker.
 
-## Output
+   +++
+   @Bob: Hello there!
+   @George: Hi, Bob!
+   +++
 
-```lua
-return {
-    passages = {
-        tutorial_100 = {
-            text = 'HALT!\n...\nOkay, I think youre good to go.\nWhy are you here?',
-            responses = {
-                {text = "I'm not sure", link = 'tutorial_101'},
-                {text = 'Why should I answer you?', link = 'tutorial_102'}
-            },
-            props = {tutorial = 1}
-        },
-        Greeting = {text = 'Hey\nWhat do you want?'},
-        tutorial_200 = {
-            text = 'Your staff just got some magic in it\nTry using it to fix this pillar over here.',
-            responses = {{text = '', link = 'tutorial_300', isEnd = true}},
-            props = {highlight = 'tutorial_2'}
-        },
-        tutorial_101 = {
-            text = 'Not sure eh?\nOkay...',
-            responses = {{text = 'Do you need any help?', link = 'tutorial_110'}}
-        },
-        tutorial_102 = {
-            text = "This castle is important to me, I'm not just going to let some nobody enter without explaining themselves",
-            responses = {{text = 'Do you need any help?', link = 'tutorial_110'}}
-        },
-        tutorial_110 = {
-            text = '?\nWell, actually, yeah\nI can see your staff, so youre a wizzard...\nDo you mind cleaning this place up a little bit?',
-            responses = {
-                {text = 'Sure, but actually... how do i do that?', link = 'tutorial_150'},
-                {text = 'Who am I talking to?', link = 'tutorial_120'}
-            }
-        },
-        tutorial_150 = {
-            text = 'Hmm, okay...\nFor now just go onto the fountain',
-            responses = {{text = 'Okay', link = 'tutorial_200', isEnd = true}},
-            props = {highlight = 'tutorial_1'}
-        },
-        tutorial_300 = {
-            text = 'That was pretty good',
-            responses = {{text = 'How did I do that?', link = 'tutorial_310'}}
-        },
-        tutorial_310 = {
-            text = 'Well\nYour staff collected our EP (Ectoplasm)\nYou can use the staff to do various spells',
-            responses = {{text = 'Okay, thanks! Bye', link = 'tutorial_320'}}
-        },
-        tutorial_120 = {
-            text = 'That doesnt matter right now',
-            responses = {
-                {text = 'How can I trust you if I dont know who you are?', link = 'tutorial_130'},
-                {text = 'How do I "clean up"?', link = 'tutorial_150'}
-            }
-        },
-        tutorial_130 = {
-            text = "Ugh\nI'm a ghost\nI used to live here\nWell...\nI used to protect this area...\nI'm the main butler around here",
-            responses = {{text = 'Okay, sorry. How do I "clean up" as you said?', link = 'tutorial_150'}}
-        },
-        tutorial_320 = {text = 'Bye'}
-    },
-    name = 'HT - Butler',
-    start_node_name = 'tutorial_100'
-}
+- **Emotions**: Wrap emotions in `{{` and `}}` within the line.
 
-```
+   +++
+   @Bob: I'm feeling great! {{happy}}
+   +++
+
+- **Conditions**: Use `?($category.varName == value)` to display a line only if the condition is met.
+
+   +++
+   ?($checks.hasKey == true) @George: You found the key!
+   +++
+
+### Responses and Links
+
+- **Clickable Responses**: Use standard Twine link notation.
+
+   +++
+   [[Yes|affirmative_response]]
+   [[No|negative_response]]
+   +++
+
+- **Urgent Responses**: Wrap the link with exclamation marks to prioritize.
+
+   +++
+   ![[This is urgent|urgent_response]]!
+   +++
+
+- **End Links**: Prefix the link text with `---` to indicate a non-interactive transition.
+
+   +++
+   [[---|next_passage]]
+   [[---Proceed|next_passage]]
+   +++
+
+### Props and Variables
+
+- **Set Props**: Use `$category.varName = value` to set properties.
+
+   +++
+   $highlight = "tutorial_1"
+   $stats.health = 100
+   +++
+
+## Output Format
+
+The parser converts your Twine story into a Lua table:
+
+   +++
+   return {
+       passages = {
+           passage_name = {
+               lines = {
+                   { text = "Hello there!", name = "Bob", emotion = "happy" },
+                   { text = "You found the key!", name = "George", condition = { varName = "hasKey", category = "checks", comparator = "eq", value = true } },
+                   { text = "Be careful now.", name = "Bob" }
+               },
+               responses = {
+                   { text = "Yes", link = "affirmative_response" },
+                   { text = "No", link = "negative_response" }
+               },
+               props = {
+                   { category = "highlight", varName = "tutorial_1", value = true },
+                   { category = "stats", varName = "health", value = 100 }
+               },
+               tags = { "example", "tutorial" }
+           }
+       },
+       name = "My Twine Story",
+       start_node_name = "start_passage"
+   }
+   +++
+
+## Features
+
+- **Multiple Speakers**: Assign different speakers to each line using `@Name:`.
+- **Emotions**: Add emotions to lines with `{{emotion}}`.
+- **Conditional Dialogue**: Display lines based on conditions using `?($category.varName == value)`.
+- **Dynamic Props**: Set properties within passages with `$category.varName = value`.
+- **Urgent Responses**: Highlight important responses by wrapping links with exclamation marks.
+- **Non-Interactive Transitions**: Use `---` in links to create redirects without player input.
+
+## Example
+
+### Twine Input
+
+   +++
+   @Bob: Welcome to the adventure! {{excited}}
+   $highlight = "intro"
+   ?($stats.level > 1) @Bob: I see you're experienced.
+
+   [[Start Quest|quest_start]]
+   ![[Visit Shop|shop]]!
+   [[---|next_passage]]
+   +++
+
+### Lua Output
+
+   +++
+   return {
+       passages = {
+           start_passage = {
+               lines = {
+                   { text = "Welcome to the adventure!", name = "Bob", emotion = "excited" },
+                   { text = "I see you're experienced.", name = "Bob", condition = { varName = "level", category = "stats", comparator = "gt", value = 1 } }
+               },
+               responses = {
+                   { text = "Start Quest", link = "quest_start" },
+                   { text = "Visit Shop", link = "shop", isUrgent = true }
+               },
+               redirects = {
+                   { link = "next_passage", isEnd = true }
+               },
+               props = {
+                   { category = "highlight", varName = "intro", value = true }
+               }
+           }
+       },
+       name = "Adventure Story",
+       start_node_name = "start_passage"
+   }
+   +++
 
 ## Development
 
-If you want to hack on twine_lua_parser itself:
+To work on `twine_lua_parser`:
 
-1. Clone this repo
-2. Install the dependencies with `npm install`
-3. Run `npm start`
+1. Clone the repository.
+2. Install dependencies:
+   +++
+   npm install
+   +++
+3. Start the development server:
+   +++
+   npm start
+   +++
+
+## Notes
+
+- Ensure that each passage in Twine follows the input notation for proper parsing.
+- The parser handles conditions, emotions, and character names seamlessly to generate a structured Lua output.
+
