@@ -3,7 +3,7 @@
 <head>
   <title>{{STORY_NAME}}</title>
   <script type="text/javascript">
-    {{SCRIPT}}
+    { { SCRIPT } }
   </script>
   <style>
     body,
@@ -40,6 +40,21 @@
       border-radius: 10px;
     }
 
+    #unrecognizedNames {
+      margin-top: 1em;
+      width: 500px;
+      max-width: 80vw;
+      padding: 1em;
+      border: #0F1035 4px solid;
+      border-radius: 10px;
+      background-color: #7FC7D9;
+      color: white;
+    }
+
+    #unrecognizedNames button {
+      margin-top: 0.5em;
+    }
+
     button {
       width: 180px;
       height: 40px;
@@ -67,12 +82,51 @@
 </head>
 
 <body>
-  <button onclick="copyText(this)">Copy output</button>
+  <button onclick="copyText()">Copy output</button>
   <pre id="output"></pre>
+  <div id="unrecognizedNames"></div>
   <div id="storyData">
     {{STORY_DATA}}
   </div>
   <script>
+    const recognizedNames = JSON.parse(localStorage.getItem("recognizedNames") || "[]");
+
+    function displayUnrecognizedNames(names) {
+      const unrecognizedDiv = document.getElementById("unrecognizedNames");
+      unrecognizedDiv.innerHTML = "<h3>Unrecognized Names:</h3>";
+
+      names.forEach(name => {
+        const nameDiv = document.createElement("div");
+        nameDiv.textContent = name;
+
+        const addButton = document.createElement("button");
+        addButton.textContent = "Add to Names";
+        addButton.onclick = () => addToRecognizedNames(name);
+
+        const correctButton = document.createElement("button");
+        correctButton.textContent = "Flag as Error";
+        correctButton.onclick = () => alert(`Correct or verify the spelling of: ${name}`);
+
+        nameDiv.appendChild(addButton);
+        nameDiv.appendChild(correctButton);
+        unrecognizedDiv.appendChild(nameDiv);
+      });
+    }
+
+    function addToRecognizedNames(name) {
+      recognizedNames.push(name);
+      localStorage.setItem("recognizedNames", JSON.stringify(recognizedNames));
+      alert(`${name} added to recognized names.`);
+      parseTwineToLua(); // Re-run to remove recognized names from the list
+    }
+
+    function findUnrecognizedNames(text) {
+      const nameRegex = /@(\w+)/g;
+      const matches = [...text.matchAll(nameRegex)].map(match => match[1]);
+      const unrecognized = matches.filter(name => !recognizedNames.includes(name));
+      displayUnrecognizedNames(unrecognized);
+    }
+
     function copyText() {
       const textToCopy = document.getElementById("output").innerText;
       const textarea = document.createElement("textarea");
@@ -92,8 +146,11 @@
         button.disabled = false
       }, 1500);
     }
+
     parseTwineToLua();
+    findUnrecognizedNames(document.getElementById("output").innerText);
   </script>
 </body>
 
 </html>
+/html>
