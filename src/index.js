@@ -2,6 +2,7 @@ const REGEX_CONDITION =
   /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
+const REGEX_NAME = /^@(\w+):\s*(.+)$/;
 
 const decodeHtmlEntities = (text) => {
   return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
@@ -56,7 +57,7 @@ const getCondition = (text) => {
   }
   try {
     value = JSON.parse(value);
-  } catch (error) {}
+  } catch (error) { }
   return { varName, category: category ?? "checks", comparator, value };
 };
 
@@ -147,13 +148,15 @@ const cleanLinesArray = (texts) => {
 
 const parseLine = (line) => {
   const toReturnLine = {
-    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, ""),
+    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "").replace(REGEX_NAME, ""),
   };
   const condition = getCondition(line);
   const emotion = line.match(REGEX_EMOTION);
+  const nameMatch = line.match(REGEX_NAME);
 
   if (condition) toReturnLine.condition = condition;
   if (emotion) toReturnLine.emotion = emotion[0].replace(/^\{\{|\}\}$/g, "");
+  if (nameMatch) toReturnLine.name = nameMatch[1];
 
   return toReturnLine;
 };
