@@ -5,10 +5,93 @@
   <script type="text/javascript">
     { { SCRIPT } }
   </script>
-  <link rel="stylesheet" type="text/css" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
+  <style>
+    body,
+    html {
+      background-color: #365486;
+    }
+
+    * {
+      font-family: "Parkinsans", sans-serif;
+      color: #7FC7D9;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+      gap: 4em;
+      height: 100%;
+      max-width: 1000px;
+    }
+
+    .halfOfScreen {
+      flex: 1;
+      gap: 1em;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #storyData {
+      display: none;
+    }
+
+    #output {
+      overflow-y: auto;
+      text-wrap: wrap;
+      padding: 1em;
+      background-color: #00000040;
+      border-radius: 10px;
+      width: 100%;
+      color: #7fc7d98f;
+    }
+
+    #unrecognizedNames {
+      margin-top: 1em;
+      padding: 1em 2em;
+      border-radius: 10px;
+      color: white;
+      width: 100%;
+      background-color: #00000040;
+    }
+
+    #unrecognizedNames button {
+      margin-top: 0.5em;
+    }
+
+    button {
+      width: 180px;
+      height: 40px;
+      border-radius: 10px;
+      font-size: 1em;
+      background-color: #7FC7D9;
+      color: white;
+      border: #DCF2F1 1px solid;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.5;
+    }
+
+    button:active {
+      opacity: 0.2;
+    }
+
+    button:disabled {
+      opacity: 1;
+    }
+  </style>
 </head>
 
 <body>
