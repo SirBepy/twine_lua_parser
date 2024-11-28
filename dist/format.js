@@ -1,6 +1,6 @@
 window.storyFormat({
   "name": "Twine to Lua parser",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "author": "SirBepy",
   "description": "Export your Twine 2 story as a lua file (RobloxStudio)",
   "proofing": false,
