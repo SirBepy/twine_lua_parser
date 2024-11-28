@@ -4,7 +4,7 @@ import fs from "fs";
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 const js = await minify("./src/index.js");
 let html = fs.readFileSync("src/storyFormat.html", "utf-8");
-html = html.replace("{{SCRIPT}}", js);
+html = html.replace("{ { SCRIPT } }", js);
 
 const outputJSON = {
   name: "Twine to Lua parser",
