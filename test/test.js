@@ -1,29 +1,45 @@
-import chai from "chai";
+import { expect } from "chai";
 import fs from "fs";
 import jsdom from "jsdom-global";
-jsdom()
-
-var story;
+jsdom();
 
 describe("Converting to Lua", function () {
-  it("Generated the same lua file as before", async () => {
-    const storyData = fs.readFileSync("./test/fixture.html", "utf-8");
-    const div = document.createElement("div");
-    div.innerHTML = storyData;
-    story = div.childNodes[0];
-    document.body.appendChild(story);
+  const cleanup = jsdom();
 
-    const output = document.createElement("div");
-    output.setAttribute("id", "output");
-    document.body.appendChild(output);
+  afterEach(() => (document.body.innerHTML = ""));
+  after(() => cleanup());
 
-    const expected = fs.readFileSync("./test/expected.lua", "utf-8");
-    await import("../src/index.js");
+  const genericTestFunction = (fileName) => {
+    it(`Testing: ${fileName}`, async () => {
+      const storyData = fs.readFileSync(
+        `./test/test_inputs/test_${fileName}.html`,
+        "utf-8"
+      );
+      const div = document.createElement("div");
+      div.innerHTML = storyData;
+      const story = div.childNodes[0];
+      document.body.appendChild(story);
 
-    window.parseTwineToLua(story);
-    const result = document.getElementById("output").innerHTML;
-    fs.writeFileSync('./test/result.lua', result)
+      const output = document.createElement("div");
+      output.setAttribute("id", `output`);
+      document.body.appendChild(output);
 
-    chai.expect(result).to.equal(expected);
-  });
+      const expected = fs.readFileSync(
+        `./test/test_expected_outputs/${fileName}.lua`,
+        "utf-8"
+      );
+      await import("../src/index.js");
+
+      await window.parseTwineToLua(story, `output`);
+      const result = document.getElementById(`output`).innerHTML;
+      fs.writeFileSync(`./test/test_outputs/${fileName}.lua`, result);
+
+      expect(result).to.equal(expected);
+    });
+  };
+
+  genericTestFunction("basic");
+  genericTestFunction("quest");
+  genericTestFunction("optional");
+  genericTestFunction("redirect");
 });

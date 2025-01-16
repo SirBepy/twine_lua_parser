@@ -1,40 +1,119 @@
+import { Parser } from "xml2js";
+
 const REGEX_CONDITION =
   /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
 const REGEX_NAME = /^@(\w+):/;
 
+// TODO: Check each passage has atleast one line without a condition
+// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
+
+const parseQuestData = (lines) => {
+  const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
+  if (questOpeningIndex < 0) return;
+  const questClosingIndex = lines.findIndex((line) =>
+    line.includes("</quest>")
+  );
+  if (!questClosingIndex < 0)
+    return alert("You have an opening but no closing quest tag");
+
+  const questLines = lines.slice(questOpeningIndex, questClosingIndex + 1);
+  const questHTML = questLines.join("\n");
+
+  lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
+
+  return parseXml(questHTML);
+};
+
+const parseXml = async (xmlString) => {
+  const parser = new Parser();
+  const { quest } = await parser.parseStringPromise(xmlString);
+
+  const safeGet = (param) => {
+    if (!quest[param]?.[0])
+      throw new Error("Missing important quest parameter: " + param);
+    return quest[param][0];
+  };
+
+  const objectives = safeGet("objectives");
+  const rewards = safeGet("rewards");
+
+  const toReturn = {
+    title: safeGet("title"),
+    description: safeGet("description"),
+    links: {
+      onReturn: safeGet("link-on-return"),
+      onComplete: safeGet("link-on-complete"),
+    },
+
+    objectives: objectives.objective.map((obj) => ({
+      text: obj._,
+      id: obj.$.id,
+      type: obj.$.type,
+      goal: obj.$.goal && parseInt(obj.$.goal),
+    })),
+    rewards: {},
+  };
+
+  if (rewards.item) {
+    toReturn.rewards.items = rewards.item.reduce((acc, item) => {
+      acc[item.$.id] = parseInt(item.$.amount ?? 1);
+      return acc;
+    }, {});
+  }
+
+  if (rewards.prop) {
+    toReturn.rewards.props = rewards.prop.reduce((acc, prop) => {
+      acc[prop.$.id] = parseInt(prop.$.amount ?? 1);
+      return acc;
+    }, {});
+  }
+
+  if (toReturn.objectives.length == 0) {
+    throw new Error("Need atleast one objective");
+  }
+  if (
+    toReturn.objectives.find((obj) => !["progress", "check"].includes(obj.type))
+  ) {
+    throw new Error("Objective has to be either progress type or check type");
+  }
+
+  return toReturn;
+};
+
 const decodeHtmlEntities = (text) => {
   return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 };
 
-const parseValueAsLuaObject = (value) => {
-  const valueType = typeof value;
-  if (value === null) return null;
+const formatLuaObject = (value, indent = 0) => {
+  const indentString = "  ".repeat(indent);
+
   if (Array.isArray(value)) {
-    const elements = value.map(parseValueAsLuaObject).join(", ");
-    return `{${elements}}`;
+    const elements = value.map((item) => formatLuaObject(item, indent + 1));
+    return `{\n${indentString}  ${elements.join(
+      `,\n${indentString}  `
+    )}\n${indentString}}`;
   }
 
-  switch (valueType) {
-    case "number":
-    case "boolean":
-      return value.toString();
-    case "string":
-      return JSON.stringify(value);
-    case "object": {
-      const properties = Object.entries(value)
-        .map(([key, val]) => `${key} = ${parseValueAsLuaObject(val)}`)
-        .join(", ");
-      return `{${properties}}`;
-    }
-    default:
-      throw new Error(`Unsupported data type: ${valueType}`);
+  if (typeof value === "object" && value !== null) {
+    const entries = Object.entries(value).map(
+      ([key, val]) =>
+        `${indentString}  ${key} = ${formatLuaObject(val, indent + 1)}`
+    );
+    return `{\n${entries.join(",\n")}\n${indentString}}`;
   }
+
+  if (typeof value === "string") {
+    return JSON.stringify(value); // Properly format strings with quotes
+  }
+
+  return value.toString(); // For numbers and booleans
 };
 
 const convertToLuaScript = (data) => {
-  return `return ${parseValueAsLuaObject(data)}`;
+  const formattedLua = formatLuaObject(data);
+  return `return ${formattedLua}`;
 };
 
 const getCondition = (text) => {
@@ -57,7 +136,7 @@ const getCondition = (text) => {
   }
   try {
     value = JSON.parse(value);
-  } catch (error) { }
+  } catch (error) {}
   return { varName, category: category ?? "checks", comparator, value };
 };
 
@@ -113,7 +192,9 @@ const extractResponsesFromText = (texts) => {
 
   if (responses.length == 0) return;
 
-  return responses.map(parseResponse).sort(response => response.isUrgent ? 1 : 0);
+  return responses
+    .map(parseResponse)
+    .sort((response) => (response.isUrgent ? 1 : 0));
 };
 
 const extractPropsFromText = (texts) => {
@@ -148,7 +229,11 @@ const cleanLinesArray = (texts) => {
 
 const parseLine = (line) => {
   const toReturnLine = {
-    text: line.replace(REGEX_CONDITION, "").replace(REGEX_EMOTION, "").replace(REGEX_NAME, "").trim(),
+    text: line
+      .replace(REGEX_CONDITION, "")
+      .replace(REGEX_EMOTION, "")
+      .replace(REGEX_NAME, "")
+      .trim(),
   };
   const condition = getCondition(line);
   const emotion = line.match(REGEX_EMOTION);
@@ -161,9 +246,12 @@ const parseLine = (line) => {
   return toReturnLine;
 };
 
-const convertPassage = (passage) => {
+const convertPassage = async (passage) => {
   const lines = cleanLinesArray(passage.innerHTML.split("\n"));
   const dict = {};
+
+  const quest = await parseQuestData(lines);
+  if (quest) dict.quest = quest;
 
   const responses = extractResponsesFromText(lines);
   if (responses) {
@@ -176,7 +264,7 @@ const convertPassage = (passage) => {
   const props = extractPropsFromText(lines);
   if (props) dict.props = props;
 
-  ["name", "tags", "pid"].forEach((attr) => {
+  ["name", "pid"].forEach((attr) => {
     const value = passage.attributes[attr].value;
     if (value) dict[attr] = value;
   });
@@ -187,11 +275,11 @@ const convertPassage = (passage) => {
   return dict;
 };
 
-const convertStory = (story) => {
+const convertStory = async (story) => {
   const passages = story.getElementsByTagName("tw-passagedata");
-  const convertedPassages = Array.prototype.slice
-    .call(passages)
-    .map(convertPassage);
+  const convertedPassages = await Promise.all(
+    Array.prototype.slice.call(passages).map(convertPassage)
+  );
 
   const dict = {
     passages: {},
@@ -208,9 +296,9 @@ const convertStory = (story) => {
   return JSON.parse(JSON.stringify(dict));
 };
 
-const parseTwineToLua = () => {
+const parseTwineToLua = async () => {
   const storyData = document.getElementsByTagName("tw-storydata")[0];
-  const response = convertToLuaScript(convertStory(storyData));
+  const response = convertToLuaScript(await convertStory(storyData));
   document.getElementById("output").innerHTML = response;
 };
 
