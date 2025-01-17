@@ -12259,8 +12259,11 @@
 	const REGEX_EMOTION = /\{\{.+?\}\}/g;
 	const REGEX_NAME = /^@(\w+):/;
 
+	// TODO: Show errors in DOM instead of console
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
+
+	const parseLink = (text) => text.trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
 	const parseQuestData = (lines) => {
 	  const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
@@ -12296,8 +12299,8 @@
 	    title: safeGet("title"),
 	    description: safeGet("description"),
 	    links: {
-	      onReturn: safeGet("link-on-return"),
-	      onComplete: safeGet("link-on-complete"),
+	      onReturn: parseLink(safeGet("link-on-return")),
+	      onComplete: parseLink(safeGet("link-on-complete")),
 	    },
 
 	    objectives: objectives.objective.map((obj) => ({
@@ -12394,7 +12397,7 @@
 	};
 
 	const parseResponse = ({ unparsedText, emotion }) => {
-	  const safeLink = unparsedText.replace(/^!*\[\[|\]\]!*$/g, "");
+	  const safeLink = parseLink(unparsedText);
 	  const splitLink = safeLink.split("|");
 	  const toReturn = {};
 	  if (splitLink.length == 1) toReturn.link = splitLink[0];

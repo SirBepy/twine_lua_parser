@@ -5,8 +5,8 @@ return {
         title = "Dueling Chefs: Part 1",
         description = "Help Chef A repair his kitchen and make lunch for his wife.",
         links = {
-          onReturn = " [[Dueling_Chefs_Part1_Return]] ",
-          onComplete = " [[Dueling_Chefs_Part1_Complete]] "
+          onReturn = "Dueling_Chefs_Part1_Return",
+          onComplete = "Dueling_Chefs_Part1_Complete"
         },
         objectives = {
           {
@@ -75,12 +75,6 @@ return {
         {
           text = "Hey!",
           name = "Player"
-        },
-        {
-          text = "?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false) @ChefA: You have to get a bench"
-        },
-        {
-          text = "?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.rocks == false) @ChefA: Dont forget the rocks!"
         }
       }
     },
