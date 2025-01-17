@@ -6,6 +6,7 @@ const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
 const REGEX_NAME = /^@(\w+):/;
 
+// TODO: Show errors in DOM instead of console
 // TODO: Check each passage has atleast one line without a condition
 // TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
