@@ -3,6 +3,7 @@
 ![Build Status](https://github.com/sirbepy/twine_lua_parser/workflows/Build/badge.svg)
 
 A Twine 2 story format that exports data to a Lua format. Inspired by [Twison](https://github.com/lazerwalker/twison).
+This story format transforms your Twine 2 story into a Lua data structure, enabling integration with Lua-based environments like game engines.
 
 ## Installation
 
@@ -13,6 +14,7 @@ From the Twine home screen:
    ```
    https://sirbepy.github.io/twine_lua_parser/dist/format.js
    ```
+3. Select "Twine to Lua parser" as your story format in the story editor.
 
 ## Input Notation
 
@@ -31,10 +33,10 @@ From the Twine home screen:
   @Bob: I'm feeling great! {{happy}}
   ```
 
-- **Conditions**: Use `?($category.varName == value)` to display a line only if the condition is met.
+- **Conditions**: Use `?(category.varName == value)` to display a line only if the condition is met.
 
   ```
-  ?($checks.hasKey == true) @George: You found the key!
+  ?(checks.hasKey == true) @George: You found the key!
   ```
 
 ### Responses and Links
@@ -66,6 +68,56 @@ From the Twine home screen:
   ```
   $highlight = "tutorial_1"
   $stats.health = 100
+  ```
+
+### Quests
+
+- **Quest Tags**: Define a quest using `<quest>` tags within a passage.
+
+  ```
+  <quest>
+    <title>Dueling Chefs: Part 1</title>
+    <description>Help Chef A repair his kitchen and make lunch for his wife.</description>
+    <link-on-return>[[Dueling_Chefs_Part1_Return]]</link-on-return>
+    <link-on-complete>[[Dueling_Chefs_Part1_Complete]]</link-on-complete>
+    <objectives>
+      <objective id="bench" type="progress">Find the bench blueprint for Chef A.</objective>
+      <objective id="rocks" type="check" goal="3">Find 3 Rocks.</objective>
+    </objectives>
+    <rewards>
+      <item id="black_sword" amount="1" />
+      <prop id="gold" amount="50" />
+    </rewards>
+  </quest>
+  ```
+
+- **Quest Fields**:
+
+  - `<title>`: The name of the quest.
+  - `<description>`: A brief description of the quest.
+  - `<link-on-return>`: The passage to return to during quest progress.
+  - `<link-on-complete>`: The passage to go to when the quest is completed.
+  - `<objectives>`: A list of objectives. Each objective includes:
+    - `id`: A unique identifier for the objective.
+    - `type`: The type of the objective (`progress` or `check`).
+    - `goal` (optional): The goal for the objective, e.g., a count.
+  - `<rewards>`: A list of rewards. Each reward includes:
+    - `<item>`: Items awarded, with `id` and `amount`.
+    - `<prop>`: Props awarded, with `id` and `amount`.
+
+- **Example Quest Input**:
+  ```
+  <quest>
+    <title>Beginner Quest</title>
+    <description>Complete your first task!</description>
+    <link-on-complete>[[Next Task|next_task]]</link-on-complete>
+    <objectives>
+      <objective id="start" type="progress">Complete the first task.</objective>
+    </objectives>
+    <rewards>
+      <item id="starter_sword" amount="1" />
+    </rewards>
+  </quest>
   ```
 
 ## Output Format
@@ -101,7 +153,7 @@ return {
 
 - **Multiple Speakers**: Assign different speakers to each line using `@Name:`.
 - **Emotions**: Add emotions to lines with `{{emotion}}`.
-- **Conditional Dialogue**: Display lines based on conditions using `?($category.varName == value)`.
+- **Conditional Dialogue**: Display lines based on conditions using `?(category.varName == value)`.
 - **Dynamic Props**: Set properties within passages with `$category.varName = value`.
 - **Urgent Responses**: Highlight important responses by wrapping links with exclamation marks.
 - **Non-Interactive Transitions**: Use `---` in links to create redirects without player input.
