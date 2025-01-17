@@ -26,13 +26,48 @@ return {
       }
     },
     example_option_a = {
+      responses = {
+        {
+          condition = {
+            varName = "highlight2",
+            category = "props",
+            comparator = "lt",
+            value = 4
+          },
+          link = "example_option_b",
+          text = "Hey!"
+        }
+      },
       lines = {
         {
           text = "I will say this every time, but the next line will only be said if",
           name = "Player"
         },
         {
-          text = "?($props.highlight == true) @CharA: The highlight prop was true, so im telling u highlight"
+          text = "@CharA: First optional thing",
+          condition = {
+            varName = "highlight",
+            category = "props",
+            comparator = "eq",
+            value = true
+          }
+        },
+        {
+          text = "@CharA: Second optional thing",
+          condition = {
+            varName = "example_start_completed",
+            category = "quest",
+            comparator = "gt",
+            value = 5
+          }
+        }
+      }
+    },
+    example_option_b = {
+      lines = {
+        {
+          text = "This is the end",
+          name = "Player"
         }
       }
     }

@@ -10,7 +10,18 @@ return {
           text = "And I'm still talking"
         },
         {
-          text = "I'm the player guy",
+          text = "Now I'm excited!",
+          emotion = "excited"
+        },
+        {
+          text = "Still excited"
+        },
+        {
+          text = "Now I'm sad",
+          emotion = "sad"
+        },
+        {
+          text = "I'm the player",
           name = "Player"
         }
       }
