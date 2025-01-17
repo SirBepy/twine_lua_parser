@@ -1,12 +1,12 @@
 {
   "name": "twine_lua_parser",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Export your Twine 2 story as a lua file (RobloxStudio)",
   "main": "format.js",
   "type": "module",
   "scripts": {
     "test": "mocha ./test/test.js",
-    "build": "node build.js",
+    "build": "npm i && npx rollup -c && node build.js",
     "full-test": "npm run build && npm run test"
   },
   "repository": {
@@ -20,9 +20,13 @@
   },
   "homepage": "https://github.com/sirbepy/twine_lua_parser",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "chai": "^5.1.2",
     "express": "^4.18.2",
     "jsdom": "^16.7.0",
+    "rollup": "^4.30.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
     "watch": "^0.16.0"
   },
   "dependencies": {

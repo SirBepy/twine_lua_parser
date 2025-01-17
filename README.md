@@ -20,82 +20,82 @@ From the Twine home screen:
 
 - **Character Names**: Use `@Name:` at the beginning of a line to specify the speaker.
 
-   ```
-   @Bob: Hello there!
-   @George: Hi, Bob!
-   ```
+  ```
+  @Bob: Hello there!
+  @George: Hi, Bob!
+  ```
 
 - **Emotions**: Wrap emotions in `{{` and `}}` within the line.
 
-   ```
-   @Bob: I'm feeling great! {{happy}}
-   ```
+  ```
+  @Bob: I'm feeling great! {{happy}}
+  ```
 
 - **Conditions**: Use `?($category.varName == value)` to display a line only if the condition is met.
 
-   ```
-   ?($checks.hasKey == true) @George: You found the key!
-   ```
+  ```
+  ?($checks.hasKey == true) @George: You found the key!
+  ```
 
 ### Responses and Links
 
 - **Clickable Responses**: Use standard Twine link notation.
 
-   ```
-   [[Yes|affirmative_response]]
-   [[No|negative_response]]
-   ```
+  ```
+  [[Yes|affirmative_response]]
+  [[No|negative_response]]
+  ```
 
 - **Urgent Responses**: Wrap the link with exclamation marks to prioritize.
 
-   ```
-   ![[This is urgent|urgent_response]]!
-   ```
+  ```
+  ![[This is urgent|urgent_response]]!
+  ```
 
-- **End Links**: Prefix the link text with `---` to indicate a non-interactive transition.
+- **End Links**: Prefix the link text with `---` to indicate what should be the next dialog that the user sees when he comes back.
 
-   ```
-   [[---|next_passage]]
-   [[---Proceed|next_passage]]
-   ```
+  ```
+  [[next_passage]]
+  [[---Proceed|next_passage]]
+  ```
 
 ### Props and Variables
 
 - **Set Props**: Use `$category.varName = value` to set properties.
 
-   ```
-   $highlight = "tutorial_1"
-   $stats.health = 100
-   ```
+  ```
+  $highlight = "tutorial_1"
+  $stats.health = 100
+  ```
 
 ## Output Format
 
 The parser converts your Twine story into a Lua table:
 
-   ```
-   return {
-       passages = {
-           passage_name = {
-               lines = {
-                   { text = "Hello there!", name = "Bob", emotion = "happy" },
-                   { text = "You found the key!", name = "George", condition = { varName = "hasKey", category = "checks", comparator = "eq", value = true } },
-                   { text = "Be careful now.", name = "Bob" }
-               },
-               responses = {
-                   { text = "Yes", link = "affirmative_response" },
-                   { text = "No", link = "negative_response" }
-               },
-               props = {
-                   { category = "highlight", varName = "tutorial_1", value = true },
-                   { category = "stats", varName = "health", value = 100 }
-               },
-               tags = { "example", "tutorial" }
-           }
-       },
-       name = "My Twine Story",
-       start_node_name = "start_passage"
-   }
-   ```
+```
+return {
+    passages = {
+        passage_name = {
+            lines = {
+                { text = "Hello there!", name = "Bob", emotion = "happy" },
+                { text = "You found the key!", name = "George", condition = { varName = "hasKey", category = "checks", comparator = "eq", value = true } },
+                { text = "Be careful now.", name = "Bob" }
+            },
+            responses = {
+                { text = "Yes", link = "affirmative_response" },
+                { text = "No", link = "negative_response" }
+            },
+            props = {
+                { category = "highlight", varName = "tutorial_1", value = true },
+                { category = "stats", varName = "health", value = 100 }
+            },
+            tags = { "example", "tutorial" }
+        }
+    },
+    name = "My Twine Story",
+    start_node_name = "start_passage"
+}
+```
 
 ## Features
 
@@ -110,42 +110,42 @@ The parser converts your Twine story into a Lua table:
 
 ### Twine Input
 
-   ```
-   @Bob: Welcome to the adventure! {{excited}}
-   $highlight = "intro"
-   ?($stats.level > 1) @Bob: I see you're experienced.
+```
+@Bob: Welcome to the adventure! {{excited}}
+$highlight = "intro"
+?($stats.level > 1) @Bob: I see you're experienced.
 
-   [[Start Quest|quest_start]]
-   ![[Visit Shop|shop]]!
-   [[---|next_passage]]
-   ```
+[[Start Quest|quest_start]]
+![[Visit Shop|shop]]!
+[[---|next_passage]]
+```
 
 ### Lua Output
 
-   ```
-   return {
-       passages = {
-           start_passage = {
-               lines = {
-                   { text = "Welcome to the adventure!", name = "Bob", emotion = "excited" },
-                   { text = "I see you're experienced.", name = "Bob", condition = { varName = "level", category = "stats", comparator = "gt", value = 1 } }
-               },
-               responses = {
-                   { text = "Start Quest", link = "quest_start" },
-                   { text = "Visit Shop", link = "shop", isUrgent = true }
-               },
-               redirects = {
-                   { link = "next_passage", isEnd = true }
-               },
-               props = {
-                   { category = "highlight", varName = "intro", value = true }
-               }
-           }
-       },
-       name = "Adventure Story",
-       start_node_name = "start_passage"
-   }
-   ```
+```
+return {
+    passages = {
+        start_passage = {
+            lines = {
+                { text = "Welcome to the adventure!", name = "Bob", emotion = "excited" },
+                { text = "I see you're experienced.", name = "Bob", condition = { varName = "level", category = "stats", comparator = "gt", value = 1 } }
+            },
+            responses = {
+                { text = "Start Quest", link = "quest_start" },
+                { text = "Visit Shop", link = "shop", isUrgent = true }
+            },
+            redirects = {
+                { link = "next_passage", isEnd = true }
+            },
+            props = {
+                { category = "highlight", varName = "intro", value = true }
+            }
+        }
+    },
+    name = "Adventure Story",
+    start_node_name = "start_passage"
+}
+```
 
 ## Development
 
@@ -165,4 +165,3 @@ To work on `twine_lua_parser`:
 
 - Ensure that each passage in Twine follows the input notation for proper parsing.
 - The parser handles conditions, emotions, and character names seamlessly to generate a structured Lua output.
-

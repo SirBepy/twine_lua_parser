@@ -169,8 +169,12 @@
       }, 1500);
     }
 
-    parseTwineToLua();
-    findUnrecognizedNames(document.getElementById("output").innerText);
+    async function start() {
+      await parseTwineToLua();
+      findUnrecognizedNames(document.getElementById("output").innerText);
+    }
+
+    start()
   </script>
 </body>
 
