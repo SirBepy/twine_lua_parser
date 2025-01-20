@@ -33,7 +33,7 @@ From the Twine home screen:
   @Bob: I'm feeling great! {{happy}}
   ```
 
-- **Conditions**: Use `?(category.varName == value)` to display a line only if the condition is met.
+- **Conditions**: Use `?(type.field == value)` to display a line only if the condition is met.
 
   ```
   ?(checks.hasKey == true) @George: You found the key!
@@ -63,7 +63,7 @@ From the Twine home screen:
 
 ### Props and Variables
 
-- **Set Props**: Use `$category.varName = value` to set properties.
+- **Set Props**: Use `$type.field = value` to set properties.
 
   ```
   $highlight = "tutorial_1"
@@ -130,7 +130,7 @@ return {
         passage_name = {
             lines = {
                 { text = "Hello there!", name = "Bob", emotion = "happy" },
-                { text = "You found the key!", name = "George", condition = { varName = "hasKey", category = "checks", comparator = "eq", value = true } },
+                { text = "You found the key!", name = "George", condition = { field = "hasKey", type = "checks", comparator = "eq", value = true } },
                 { text = "Be careful now.", name = "Bob" }
             },
             responses = {
@@ -138,8 +138,8 @@ return {
                 { text = "No", link = "negative_response" }
             },
             props = {
-                { category = "highlight", varName = "tutorial_1", value = true },
-                { category = "stats", varName = "health", value = 100 }
+                { type = "highlight", field = "tutorial_1", value = true },
+                { type = "stats", field = "health", value = 100 }
             },
             tags = { "example", "tutorial" }
         }
@@ -153,8 +153,8 @@ return {
 
 - **Multiple Speakers**: Assign different speakers to each line using `@Name:`.
 - **Emotions**: Add emotions to lines with `{{emotion}}`.
-- **Conditional Dialogue**: Display lines based on conditions using `?(category.varName == value)`.
-- **Dynamic Props**: Set properties within passages with `$category.varName = value`.
+- **Conditional Dialogue**: Display lines based on conditions using `?(type.field == value)`.
+- **Dynamic Props**: Set properties within passages with `$type.field = value`.
 - **Urgent Responses**: Highlight important responses by wrapping links with exclamation marks.
 - **Non-Interactive Transitions**: Use `---` in links to create redirects without player input.
 
@@ -180,7 +180,7 @@ return {
         start_passage = {
             lines = {
                 { text = "Welcome to the adventure!", name = "Bob", emotion = "excited" },
-                { text = "I see you're experienced.", name = "Bob", condition = { varName = "level", category = "stats", comparator = "gt", value = 1 } }
+                { text = "I see you're experienced.", name = "Bob", condition = { field = "level", type = "stats", comparator = "gt", value = 1 } }
             },
             responses = {
                 { text = "Start Quest", link = "quest_start" },
@@ -190,7 +190,7 @@ return {
                 { link = "next_passage", isEnd = true }
             },
             props = {
-                { category = "highlight", varName = "intro", value = true }
+                { type = "highlight", field = "intro", value = true }
             }
         }
     },
