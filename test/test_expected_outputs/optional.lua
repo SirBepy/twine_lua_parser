@@ -9,8 +9,13 @@ return {
       },
       props = {
         {
-          varName = "highlight",
-          category = "checks",
+          field = "something",
+          type = "props",
+          value = 1
+        },
+        {
+          field = "highlight",
+          type = "checks",
           value = true
         }
       },
@@ -29,8 +34,8 @@ return {
       responses = {
         {
           condition = {
-            varName = "highlight2",
-            category = "props",
+            field = "highlight2",
+            type = "props",
             comparator = "lt",
             value = 4
           },
@@ -46,8 +51,8 @@ return {
         {
           text = "@CharA: First optional thing",
           condition = {
-            varName = "highlight",
-            category = "props",
+            field = "highlight",
+            type = "props",
             comparator = "eq",
             value = true
           }
@@ -55,8 +60,18 @@ return {
         {
           text = "@CharA: Second optional thing",
           condition = {
-            varName = "example_start_completed",
-            category = "quest",
+            field = "example_start",
+            type = "quest",
+            comparator = "gt",
+            value = 5
+          }
+        },
+        {
+          text = "@CharA: Third optional thing",
+          condition = {
+            field = "example_start",
+            subField = "collect_apples",
+            type = "quest",
             comparator = "gt",
             value = 5
           }

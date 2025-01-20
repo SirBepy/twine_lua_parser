@@ -1,8 +1,9 @@
 import { Parser } from "xml2js";
 
 const REGEX_CONDITION =
-  /\?\((?:(\w+)\.)?(\w+)\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
-const REGEX_PROPS = /\$(?:(\w+)\.)?(\w+)\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
+  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
+const REGEX_PROPS =
+  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
 const REGEX_NAME = /^@(\w+):/;
 
@@ -122,7 +123,7 @@ const convertToLuaScript = (data) => {
 const getCondition = (text) => {
   const match = text.match(REGEX_CONDITION);
   if (!match) return;
-  let [_, category, varName, comparator, value] = match;
+  let [_, type, field, subField, comparator, value] = match;
 
   switch (comparator) {
     case "==":
@@ -140,7 +141,13 @@ const getCondition = (text) => {
   try {
     value = JSON.parse(value);
   } catch (error) {}
-  return { varName, category: category ?? "checks", comparator, value };
+  return {
+    field,
+    subField,
+    type: type ?? "checks",
+    comparator,
+    value,
+  };
 };
 
 const parseResponse = ({ unparsedText, emotion }) => {
@@ -208,8 +215,8 @@ const extractPropsFromText = (texts) => {
     const match = currentString.match(REGEX_PROPS);
 
     if (match) {
-      const [_, category, varName, value] = match;
-      const prop = { varName, category: category ?? "checks" };
+      const [_, type, field, subField, value] = match;
+      const prop = { field, type: type ?? "checks" };
       try {
         prop.value = JSON.parse(value);
       } catch (error) {
