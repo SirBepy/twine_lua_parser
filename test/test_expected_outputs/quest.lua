@@ -4,6 +4,7 @@ return {
       quest = {
         title = "Dueling Chefs: Part 1",
         description = "Help Chef A repair his kitchen and make lunch for his wife.",
+        turnInNPC = "ChefA",
         links = {
           onReturn = "Dueling_Chefs_Part1_Return",
           onComplete = "Dueling_Chefs_Part1_Complete"

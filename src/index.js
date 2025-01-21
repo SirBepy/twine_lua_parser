@@ -46,6 +46,7 @@ const parseXml = async (xmlString) => {
   const toReturn = {
     title: safeGet("title"),
     description: safeGet("description"),
+    turnInNPC: safeGet("turn-in-npc"),
     links: {
       onReturn: parseLink(safeGet("link-on-return")),
       onComplete: parseLink(safeGet("link-on-complete")),
