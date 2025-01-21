@@ -120,6 +120,7 @@
   <script>
     const recognizedNames = JSON.parse(localStorage.getItem("recognizedNames") || "[]");
     const nameRegex = /@(\w+)/g;
+    const turnInNPCRegex = /turnInNPC\s*=\s*"@(\w+)"/g;
 
     function displayUnrecognizedNames(names) {
       const unrecognizedDiv = document.getElementById("unrecognizedNames");
@@ -148,8 +149,14 @@
       const text = document.getElementById("output").innerText
       const unrecognized = {};
       [...text.matchAll(nameRegex)].forEach(match => {
-        if (recognizedNames.includes(match[1])) return
-        unrecognized[match[1]] = true
+        if (!recognizedNames.includes(match[1])) {
+          unrecognized[match[1]] = true;
+        }
+      });
+      [...text.matchAll(turnInNPCRegex)].forEach(match => {
+        if (!recognizedNames.includes(match[1])) {
+          unrecognized[match[1]] = true;
+        }
       });
 
       displayUnrecognizedNames(Object.keys(unrecognized));
