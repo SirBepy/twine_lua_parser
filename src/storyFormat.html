@@ -71,7 +71,26 @@
     }
 
     #unrecognizedNames button {
-      margin-top: 0.5em;
+      display: absolute;
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 32px;
+      top: 50%;
+      left: -10px;
+      transform: translate(-100%, -50%);
+
+      font-size: 1.5em;
+      line-height: 32.5px;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    li {
+      position: relative;
+      padding: 1em 0;
     }
 
     button {
@@ -120,7 +139,7 @@
   <script>
     const recognizedNames = JSON.parse(localStorage.getItem("recognizedNames") || "[]");
     const nameRegex = /@(\w+)/g;
-    const turnInNPCRegex = /turnInNPC\s*=\s*"@(\w+)"/g;
+    const turnInNPCRegex = /\b(turnInNPC|name)\b\s*=\s*"(\w+)"/g;
 
     function displayUnrecognizedNames(names) {
       const unrecognizedDiv = document.getElementById("unrecognizedNames");
@@ -154,8 +173,8 @@
         }
       });
       [...text.matchAll(turnInNPCRegex)].forEach(match => {
-        if (!recognizedNames.includes(match[1])) {
-          unrecognized[match[1]] = true;
+        if (!recognizedNames.includes(match[2])) {
+          unrecognized[match[2]] = true;
         }
       });
 
@@ -184,7 +203,7 @@
 
     async function start() {
       await parseTwineToLua();
-      findUnrecognizedNames(document.getElementById("output").innerText);
+      findUnrecognizedNames();
     }
 
     start()
