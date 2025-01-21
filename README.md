@@ -78,6 +78,7 @@ From the Twine home screen:
   <quest>
     <title>Dueling Chefs: Part 1</title>
     <description>Help Chef A repair his kitchen and make lunch for his wife.</description>
+    <turn-in-npc>ChefA</turn-in-npc>
     <link-on-return>[[Dueling_Chefs_Part1_Return]]</link-on-return>
     <link-on-complete>[[Dueling_Chefs_Part1_Complete]]</link-on-complete>
     <objectives>
