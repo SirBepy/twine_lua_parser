@@ -12261,6 +12261,7 @@
 	const REGEX_NAME = /^@(\w+):/;
 
 	// TODO: Show errors in DOM instead of console
+	// TODO: Add option to see and remove one (or all) accepted names
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
@@ -12305,12 +12306,21 @@
 	      onComplete: parseLink(safeGet("link-on-complete")),
 	    },
 
-	    objectives: objectives.objective.map((obj) => ({
-	      text: obj._,
-	      id: obj.$.id,
-	      type: obj.$.type,
-	      goal: obj.$.goal && parseInt(obj.$.goal),
-	    })),
+	    objectives: objectives.objective.map((obj) => {
+	      const toReturn = {
+	        text: obj._,
+	        id: obj.$.id,
+	        type: obj.$.type,
+	      };
+	      if (toReturn.type === "progress") {
+	        const goal = parseInt(obj.$.goal);
+	        if (!goal || goal <= 0) {
+	          throw new Error("Missing goal of objective: " + toReturn.id);
+	        }
+	        toReturn.goal = goal;
+	      }
+	      return toReturn;
+	    }),
 	    rewards: {},
 	  };
 
