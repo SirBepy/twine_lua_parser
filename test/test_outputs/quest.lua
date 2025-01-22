@@ -13,12 +13,12 @@ return {
           {
             text = "Find the bench blueprint for Chef A.",
             id = "bench",
-            type = "progress"
+            type = "check"
           },
           {
             text = "Find 3 Rocks.",
             id = "rocks",
-            type = "check",
+            type = "progress",
             goal = 3
           }
         },
