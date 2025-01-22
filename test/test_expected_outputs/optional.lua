@@ -49,32 +49,35 @@ return {
           name = "Player"
         },
         {
-          text = "@CharA: First optional thing",
+          text = "First optional thing",
           condition = {
             field = "highlight",
             type = "props",
             comparator = "eq",
             value = true
-          }
+          },
+          name = "CharA"
         },
         {
-          text = "@CharA: Second optional thing",
+          text = "Second optional thing",
           condition = {
             field = "example_start",
             type = "quest",
             comparator = "gt",
             value = 5
-          }
+          },
+          name = "CharA"
         },
         {
-          text = "@CharA: Third optional thing",
+          text = "Third optional thing",
           condition = {
             field = "example_start",
             subField = "collect_apples",
             type = "quest",
             comparator = "gt",
             value = 5
-          }
+          },
+          name = "CharA"
         }
       }
     },
