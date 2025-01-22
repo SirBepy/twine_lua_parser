@@ -12258,9 +12258,10 @@
 	const REGEX_PROPS =
 	  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 	const REGEX_EMOTION = /\{\{.+?\}\}/g;
-	const REGEX_NAME = /^@(\w+):/;
+	const REGEX_NAME = /@(\w+):/;
 
 	// TODO: Show errors in DOM instead of console
+	// TODO: Detect if quests in conditions even exist
 	// TODO: Add option to see and remove one (or all) accepted names
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also

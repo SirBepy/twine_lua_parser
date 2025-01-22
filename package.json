@@ -1,6 +1,6 @@
 {
   "name": "twine_lua_parser",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "Export your Twine 2 story as a lua file (RobloxStudio)",
   "main": "format.js",
   "type": "module",
