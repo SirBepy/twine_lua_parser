@@ -39,7 +39,7 @@ describe("Converting to Lua", function () {
   };
 
   genericTestFunction("basic");
-  genericTestFunction("quest");
   genericTestFunction("optional");
+  genericTestFunction("quest");
   genericTestFunction("redirect");
 });
