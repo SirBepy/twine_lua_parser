@@ -54,21 +54,21 @@ const parseXml = async (xmlString) => {
       onComplete: parseLink(safeGet("link-on-complete")),
     },
 
-    objectives: objectives.objective.map((obj) => {
-      const toReturn = {
+    objectives: objectives.objective.reduce((acc, obj) => {
+      const objective = {
         text: obj._,
-        id: obj.$.id,
         type: obj.$.type,
       };
-      if (toReturn.type === "progress") {
+      if (objective.type === "progress") {
         const goal = parseInt(obj.$.goal);
         if (!goal || goal <= 0) {
-          throw new Error("Missing goal of objective: " + toReturn.id);
+          throw new Error("Missing goal of objective: " + obj.$.id);
         }
-        toReturn.goal = goal;
+        objective.goal = goal;
       }
-      return toReturn;
-    }),
+      acc[obj.$.id] = objective;
+      return acc;
+    }, {}),
     rewards: {},
   };
 
@@ -86,12 +86,11 @@ const parseXml = async (xmlString) => {
     }, {});
   }
 
-  if (toReturn.objectives.length == 0) {
+  let objectivesArr = Object.values(toReturn.objectives);
+  if (objectivesArr.length == 0) {
     throw new Error("Need atleast one objective");
   }
-  if (
-    toReturn.objectives.find((obj) => !["progress", "check"].includes(obj.type))
-  ) {
+  if (objectivesArr.find((obj) => !["progress", "check"].includes(obj.type))) {
     throw new Error("Objective has to be either progress type or check type");
   }
 

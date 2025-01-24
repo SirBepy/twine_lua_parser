@@ -10,14 +10,12 @@ return {
           onComplete = "Dueling_Chefs_Part1_Complete"
         },
         objectives = {
-          {
+          bench = {
             text = "Find the bench blueprint for Chef A.",
-            id = "bench",
             type = "check"
           },
-          {
+          rocks = {
             text = "Find 3 Rocks.",
-            id = "rocks",
             type = "progress",
             goal = 3
           }
