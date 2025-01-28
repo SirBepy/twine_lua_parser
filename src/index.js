@@ -118,8 +118,25 @@ const parseXml = async (xmlString) => {
   return toReturn;
 };
 
-const decodeHtmlEntities = (text) => {
-  return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+const sanitizeText = (text) => {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder("utf-8");
+  const bytes = encoder.encode(text);
+  return decoder
+    .decode(bytes)
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&hellip;/g, "...")
+    .replace(/â€¦/g, "...")
+    .replace(/â€™/g, "'")
+    .replace(/â€œ/g, '"')
+    .replace(/â€/g, '"')
+    .replace(/â€“/g, "–")
+    .replace(/â€”/g, "—")
+    .replace(/…/g, "...");
 };
 
 const formatLuaObject = (value, indent = 0) => {
@@ -265,7 +282,7 @@ const extractPropsFromText = (texts) => {
 
 const cleanLinesArray = (texts) => {
   return texts
-    .map((text) => decodeHtmlEntities(text).trim())
+    .map((text) => sanitizeText(text).trim())
     .filter((text) => !!text);
 };
 

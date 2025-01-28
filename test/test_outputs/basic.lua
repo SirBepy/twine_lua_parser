@@ -3,11 +3,11 @@ return {
     example_start = {
       lines = {
         {
-          text = "I'm one guy",
+          text = "I'm one guy...",
           name = "CharA"
         },
         {
-          text = "And I'm still talking"
+          text = "And I'm still talking..."
         },
         {
           text = "Now I'm excited!",

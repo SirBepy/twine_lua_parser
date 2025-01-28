@@ -92,7 +92,7 @@ return {
           name = "ChefA"
         },
         {
-          text = "I can still show up that @ChefB…",
+          text = "I can still show up that @ChefB...",
           name = "ChefA"
         }
       }
