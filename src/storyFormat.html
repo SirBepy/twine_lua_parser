@@ -3,11 +3,38 @@
 <head>
   <title>{{STORY_NAME}}</title>
   <script type="text/javascript">
+    function renderError(message) {
+      const output = document.getElementById("output");
+
+      console.log('=>', message);
+      // Set the error message as the output content
+      output.innerHTML += `<br /> <strong>Error:</strong> ${message}`;
+
+      // Change the background color and text color
+      output.style.backgroundColor = "#68403e"; // Red color for errors
+      output.style.color = "#fff"; // White text for contrast
+      output.style.border = "1px solid #cc0000"; // Optional border for emphasis
+      output.style.fontSize = "1em"
+
+
+      const copyButton = document.getElementById("copyButton");
+      copyButton.style.display = "none";
+    }
+
+    window.onerror = function (message, source, lineno, colno, error) {
+      setTimeout(() => renderError(error?.message || message), 100)
+      return true;
+    };
+    window.onunhandledrejection = function (event) {
+      setTimeout(() => renderError(event.reason?.message || event.reason), 100)
+      return true;
+    };
+
     { { SCRIPT } }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap" rel="stylesheet" />
   <style>
     body,
     html {
@@ -16,7 +43,7 @@
 
     * {
       font-family: "Parkinsans", sans-serif;
-      color: #7FC7D9;
+      color: #7fc7d9;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -27,18 +54,21 @@
       justify-content: center;
       align-items: center;
       margin: auto;
-      gap: 4em;
+      gap: 1em;
       height: 100%;
-      max-width: 1000px;
+      padding: 2em;
+      max-width: 1400px;
     }
 
     .halfOfScreen {
       flex: 1;
       gap: 1em;
       display: flex;
+      position: relative;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      height: 100%;
     }
 
     .outputWrapper {
@@ -53,21 +83,27 @@
       overflow-y: auto;
       text-wrap: wrap;
       padding: 1em;
-      background-color: #00000040;
+      background-color: #2c446d;
+      border: #1e2c46 2px solid;
       border-radius: 10px;
       width: 100%;
+      height: 100%;
       color: #7fc7d98f;
-      font-size: 0.5em;
-      max-height: 75vh;
+      font-size: 0.6em;
     }
 
-    #unrecognizedNames {
-      margin-top: 1em;
-      padding: 1em 2em;
+    .namesWrapper {
+      display: flex;
+    }
+
+    .namesWrapper>div {
+      padding: 2em 1em;
       border-radius: 10px;
       color: white;
       width: 100%;
-      background-color: #00000040;
+      background-color: #2c446d;
+      border: #1e2c46 2px solid;
+      flex: 1;
     }
 
     #unrecognizedNames button {
@@ -86,6 +122,8 @@
 
     ul {
       list-style: none;
+      overflow-y: auto;
+      height: 100%;
     }
 
     li {
@@ -94,14 +132,14 @@
     }
 
     button {
-      width: 180px;
-      height: 40px;
+      width: 150px;
+      height: 30px;
       border-radius: 10px;
-      font-size: 1em;
-      background-color: #7FC7D9;
+      font-size: 0.8em;
+      background-color: #2c446d;
       color: white;
-      border: #DCF2F1 1px solid;
-      transition: 0.2s;
+      border: #dcf2f1 1px solid;
+      transition: 0.15s;
       cursor: pointer;
     }
 
@@ -116,69 +154,88 @@
     button:disabled {
       opacity: 1;
     }
+
+    #copyButton {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
   </style>
+
+
 </head>
 
 <body>
   <main>
     <div class="halfOfScreen outputWrapper">
       <pre id="output"></pre>
-      <button onclick="copyText()">Copy output</button>
+      <button id="copyButton" onclick="copyText()">Copy output</button>
     </div>
-    <div class="halfOfScreen">
-      <h3>Unrecognized Names:</h3>
-      <ul id="unrecognizedNames">
-      </ul>
+    <div class="halfOfScreen namesWrapper">
+      <div>
+        <h3>Recognized Names:</h3>
+        <ul id="savedNames"></ul>
+      </div>
+      <div>
+        <h3>Unrecognized Names:</h3>
+        <ul id="unrecognizedNames"></ul>
+      </div>
     </div>
   </main>
 
-  <div id="storyData">
-    {{STORY_DATA}}
-  </div>
+  <div id="storyData">{{STORY_DATA}}</div>
 
   <script>
-    const recognizedNames = JSON.parse(localStorage.getItem("recognizedNames") || "[]");
+    const savedNames = JSON.parse(localStorage.getItem("savedNames") || "[]");
     const nameRegex = /@(\w+)/g;
     const turnInNPCRegex = /\b(turnInNPC|name)\b\s*=\s*"(\w+)"/g;
 
-    function displayUnrecognizedNames(names) {
-      const unrecognizedDiv = document.getElementById("unrecognizedNames");
+    function displayNamesInList(names, id, buttonText, buttonFunction) {
+      const unrecognizedDiv = document.getElementById();
       unrecognizedDiv.innerHTML = "";
 
-      names.forEach(name => {
+      names.forEach((name) => {
         const nameDiv = document.createElement("li");
         nameDiv.textContent = name;
 
-        const addButton = document.createElement("button");
-        addButton.textContent = "+";
-        addButton.onclick = () => addToRecognizedNames(name);
+        const button = document.createElement("button");
+        button.textContent = "+";
+        button.onclick = () => buttonFunction(name);
 
-        nameDiv.appendChild(addButton);
+        nameDiv.appendChild(button);
         unrecognizedDiv.appendChild(nameDiv);
       });
     }
 
     function addToRecognizedNames(name) {
-      recognizedNames.push(name);
-      localStorage.setItem("recognizedNames", JSON.stringify(recognizedNames));
+      savedNames.push(name);
+      localStorage.setItem("savedNames", JSON.stringify(savedNames));
       findUnrecognizedNames();
     }
 
     function findUnrecognizedNames() {
-      const text = document.getElementById("output").innerText
+      const text = document.getElementById("output").innerText;
       const unrecognized = {};
-      [...text.matchAll(nameRegex)].forEach(match => {
-        if (!recognizedNames.includes(match[1])) {
+      [...text.matchAll(nameRegex)].forEach((match) => {
+        if (!savedNames.includes(match[1])) {
           unrecognized[match[1]] = true;
         }
       });
-      [...text.matchAll(turnInNPCRegex)].forEach(match => {
-        if (!recognizedNames.includes(match[2])) {
+      [...text.matchAll(turnInNPCRegex)].forEach((match) => {
+        if (!savedNames.includes(match[2])) {
           unrecognized[match[2]] = true;
         }
       });
 
-      displayUnrecognizedNames(Object.keys(unrecognized));
+      displayRecognizedNames(savedNames, "savedNames", "-", (name) =>
+        addToRecognizedNames(name)
+      );
+      displayUnrecognizedNames(
+        Object.keys(unrecognized),
+        "unrecognizedNames",
+        "+",
+        (name) => addToRecognizedNames(name)
+      );
     }
 
     function copyText() {
@@ -188,16 +245,16 @@
 
       document.body.appendChild(textarea);
       textarea.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(textarea);
 
-      const button = document.querySelector('button');
-      button.textContent = 'Copied to clipboard';
-      button.disabled = true
+      const button = document.querySelector("button");
+      button.textContent = "Copied to clipboard";
+      button.disabled = true;
 
       setTimeout(() => {
-        button.textContent = 'Copy output';
-        button.disabled = false
+        button.textContent = "Copy output";
+        button.disabled = false;
       }, 1500);
     }
 
@@ -206,7 +263,7 @@
       findUnrecognizedNames();
     }
 
-    start()
+    start();
   </script>
 </body>
 
