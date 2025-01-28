@@ -227,10 +227,10 @@
         }
       });
 
-      displayRecognizedNames(savedNames, "savedNames", "-", (name) =>
+      displayNamesInList(savedNames, "savedNames", "-", (name) =>
         addToRecognizedNames(name)
       );
-      displayUnrecognizedNames(
+      displayNamesInList(
         Object.keys(unrecognized),
         "unrecognizedNames",
         "+",
