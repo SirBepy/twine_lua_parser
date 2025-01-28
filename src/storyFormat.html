@@ -191,7 +191,7 @@
     const turnInNPCRegex = /\b(turnInNPC|name)\b\s*=\s*"(\w+)"/g;
 
     function displayNamesInList(names, id, buttonText, buttonFunction) {
-      const unrecognizedDiv = document.getElementById();
+      const unrecognizedDiv = document.getElementById(id);
       unrecognizedDiv.innerHTML = "";
 
       names.forEach((name) => {
