@@ -12253,6 +12253,8 @@
 
 	var xml2jsExports = requireXml2js();
 
+	const WHITELISTED_OBJECTIVE_TYPES = ["progress", "check", "talk", "list"];
+
 	const REGEX_CONDITION =
 	  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 	const REGEX_PROPS =
@@ -12260,9 +12262,7 @@
 	const REGEX_EMOTION = /\{\{.+?\}\}/g;
 	const REGEX_NAME = /@(\w+):/;
 
-	// TODO: Show errors in DOM instead of console
 	// TODO: Detect if quests in conditions even exist
-	// TODO: Add option to see and remove one (or all) accepted names
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
@@ -12291,7 +12291,7 @@
 
 	  const safeGet = (param) => {
 	    if (!quest[param]?.[0])
-	      throw new Error("Missing important quest parameter: " + param);
+	      window.renderError("Missing important quest parameter: " + param);
 	    return quest[param][0];
 	  };
 
@@ -12309,21 +12309,36 @@
 
 	    objectives: objectives.objective.reduce((acc, obj) => {
 	      const objective = {
-	        text: obj._,
+	        text: obj._?.trim(),
 	        type: obj.$.type,
+	        observe: obj.$.observe,
 	      };
+
 	      if (objective.type === "progress") {
 	        const goal = parseInt(obj.$.goal);
 	        if (!goal || goal <= 0) {
-	          throw new Error("Missing goal of objective: " + obj.$.id);
+	          window.renderError("Missing goal of objective: " + obj.$.id);
 	        }
 	        objective.goal = goal;
+	      } else if (objective.type === "talk") {
+	        objective.goal = obj.$.goal;
+	      }
+
+	      if (!objective.type) {
+	        window.renderError("Missing type of objective: " + obj.$.id);
+	      }
+	      if (!objective.text) {
+	        window.renderError("Missing text of objective: " + obj.$.id);
 	      }
 	      acc[obj.$.id] = objective;
 	      return acc;
 	    }, {}),
 	    rewards: {},
 	  };
+
+	  if (objectives.$?.ordered) {
+	    toReturn.areObjectivesOrdered = true;
+	  }
 
 	  if (rewards.item) {
 	    toReturn.rewards.items = rewards.item.reduce((acc, item) => {
@@ -12341,10 +12356,16 @@
 
 	  let objectivesArr = Object.values(toReturn.objectives);
 	  if (objectivesArr.length == 0) {
-	    throw new Error("Need atleast one objective");
+	    window.renderError("Need atleast one objective");
 	  }
-	  if (objectivesArr.find((obj) => !["progress", "check"].includes(obj.type))) {
-	    throw new Error("Objective has to be either progress type or check type");
+
+	  if (
+	    objectivesArr.find((obj) => !WHITELISTED_OBJECTIVE_TYPES.includes(obj.type))
+	  ) {
+	    window.renderError(
+	      "Objective has to be one of the following types: " +
+	        WHITELISTED_OBJECTIVE_TYPES
+	    );
 	  }
 
 	  return toReturn;
@@ -12573,7 +12594,10 @@
 	const parseTwineToLua = async () => {
 	  const storyData = document.getElementsByTagName("tw-storydata")[0];
 	  const response = convertToLuaScript(await convertStory(storyData));
-	  document.getElementById("output").innerHTML = response;
+	  const alreadyHasContent = document.getElementById("output").innerHTML;
+
+	  if (!alreadyHasContent)
+	    document.getElementById("output").innerHTML = response;
 	};
 
 	window.parseTwineToLua = parseTwineToLua;

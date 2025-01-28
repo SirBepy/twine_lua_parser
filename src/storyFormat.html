@@ -3,7 +3,7 @@
 <head>
   <title>{{STORY_NAME}}</title>
   <script type="text/javascript">
-    function renderError(message) {
+    window.renderError = (message) => {
       const output = document.getElementById("output");
 
       console.log('=>', message);
@@ -22,11 +22,11 @@
     }
 
     window.onerror = function (message, source, lineno, colno, error) {
-      setTimeout(() => renderError(error?.message || message), 100)
+      setTimeout(() => window.renderError(error?.message || message), 100)
       return true;
     };
     window.onunhandledrejection = function (event) {
-      setTimeout(() => renderError(event.reason?.message || event.reason), 100)
+      setTimeout(() => window.renderError(event.reason?.message || event.reason), 100)
       return true;
     };
 
