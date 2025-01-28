@@ -59,12 +59,15 @@ const parseXml = async (xmlString) => {
         text: obj._,
         type: obj.$.type,
       };
+
       if (objective.type === "progress") {
         const goal = parseInt(obj.$.goal);
         if (!goal || goal <= 0) {
           throw new Error("Missing goal of objective: " + obj.$.id);
         }
         objective.goal = goal;
+      } else if (objective.type === "talk") {
+        objective.goal = obj.$.goal;
       }
       acc[obj.$.id] = objective;
       return acc;
@@ -90,7 +93,11 @@ const parseXml = async (xmlString) => {
   if (objectivesArr.length == 0) {
     throw new Error("Need atleast one objective");
   }
-  if (objectivesArr.find((obj) => !["progress", "check"].includes(obj.type))) {
+  if (
+    objectivesArr.find(
+      (obj) => !["progress", "check", "talk"].includes(obj.type)
+    )
+  ) {
     throw new Error("Objective has to be either progress type or check type");
   }
 
