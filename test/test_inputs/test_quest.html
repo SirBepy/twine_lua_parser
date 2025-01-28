@@ -1,21 +1,10 @@
 <tw-storydata name="Shroomshire Restoration" startnode="1">
   <style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>
   <script role="script" id="twine-user-script" type="text/twine-javascript"></script>
-  <tw-passagedata pid="1" name="Dueling_Chefs_Part1_FindKitchenBlueprints">
-    @ChefA: This is an absolute disaster!
-
-    @Player: What&#39;s wrong?
-
-    @ChefA: My table is broken
-
-    @Player: Maybe I can help?
-
-    @ChefA: Better than just standing around!
-    We&#39;ll need plans for a [Bench] and [3 Rocks]
-
-    @Player: I&#39;ll get to it!
-
-    @ChefA: An absolute disaster…
+  <tw-passagedata pid="1" name="quest_start">
+    @ChefA: This is a test
+    @Player: Okay
+    @ChefA: Find a [Bench Blueprint]
     [[---|Dueling_Chefs_Part1_Return]]
 
     <quest>
@@ -24,26 +13,56 @@
       <turn-in-npc>ChefA</turn-in-npc>
       <link-on-return> [[Dueling_Chefs_Part1_Return]] </link-on-return>
       <link-on-complete> [[Dueling_Chefs_Part1_Complete]] </link-on-complete>
-      <objectives>
-        <objective type="check" id="bench">Find the bench blueprint for Chef A.</objective>
-        <objective type="progress" goal="3" id="rocks">Find 3 Rocks.</objective>
+      <objectives ordered="true">
+        <objective type="check" id="bench">Objective that gets completed by manipulating this objective itself
+        </objective>
+        <objective type="check" id="specific_item" observe="tycoon_progress.48a98fn2-419n-41hz-vn82-9815n89zcv92">
+          Objective gets completed if this prop returns truthy</objective>
+
+        <objective type="progress" id="rocks" goal="3">
+          Objective that gets completed by incrementing this abstract number only for this objective
+        </objective>
+        <objective type="progress" id="rocks2" goal="3" observe="inventory.rocks">
+          Objective that gets completed by incrementing this specific prop number</objective>
+        <objective type="list" id="purchases">
+          Objective that gets completed by manipulating items within the list that are props
+          <list-item id="tycoon_progress.0baed953-25f2-4a26-afc4-024b10797e99"></list-item>
+          <list-item id="tycoon_progress.845189fe-f2aa-9fc8-4ncz-084818s8f8a8"></list-item>
+          <list-item id="tycoon_progress.14fhz8am-v341-4123-n4gz-4h89189vna92"></list-item>
+        </objective>
+
+        <objective type="talk" id="askCheffie" goal="CheffieA">
+          Objective that gets completed by talking to a specific NPC
+        </objective>
       </objectives>
       <rewards>
         <item id="black_sword"></item>
         <prop id="gold" amount="50"></prop>
       </rewards>
     </quest>
-
   </tw-passagedata>
-  <tw-passagedata pid="2" name="Dueling_Chefs_Part1_Return">
-    @Player: Hey!
-  </tw-passagedata>
-  <tw-passagedata pid="3" name="Dueling_Chefs_Part1_Complete">
+  <tw-passagedata pid="2" name="quest_return"> @Player: Hey! </tw-passagedata>
+  <tw-passagedata pid="3" name="quest_complete">
     @ChefA: You found the plans! Thanks, @Player.
     @ChefA: I can still show up that @ChefB…
     [[---|Default]]
   </tw-passagedata>
-  <tw-passagedata pid="4" name="Default">
+  <tw-passagedata pid="4" name="default">
     Now Ill always say this
+    <quest>
+      <title>Dueling Chefs: Part 2</title>
+      <description>Description</description>
+      <turn-in-npc>ChefA</turn-in-npc>
+      <link-on-return> [[Dueling_Chefs_Part1_Return]] </link-on-return>
+      <link-on-complete> [[Dueling_Chefs_Part1_Complete]] </link-on-complete>
+      <objectives>
+        <objective type="check" id="bench">Objective that gets completed by manipulating this objective itself
+        </objective>
+      </objectives>
+      <rewards>
+        <item id="black_sword"></item>
+        <prop id="gold" amount="50"></prop>
+      </rewards>
+    </quest>
   </tw-passagedata>
 </tw-storydata>

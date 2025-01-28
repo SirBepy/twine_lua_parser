@@ -1,5 +1,7 @@
 import { Parser } from "xml2js";
 
+const WHITELISTED_OBJECTIVE_TYPES = ["progress", "check", "talk", "list"];
+
 const REGEX_CONDITION =
   /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
 const REGEX_PROPS =
@@ -56,10 +58,12 @@ const parseXml = async (xmlString) => {
 
     objectives: objectives.objective.reduce((acc, obj) => {
       const objective = {
-        text: obj._,
+        text: obj._?.trim(),
         type: obj.$.type,
+        observe: obj.$.observe,
       };
 
+      // console.log("=> " + obj._?.trim());
       if (objective.type === "progress") {
         const goal = parseInt(obj.$.goal);
         if (!goal || goal <= 0) {
@@ -69,11 +73,22 @@ const parseXml = async (xmlString) => {
       } else if (objective.type === "talk") {
         objective.goal = obj.$.goal;
       }
+
+      if (!objective.type) {
+        throw new Error("Missing type of objective: " + obj.$.id);
+      }
+      if (!objective.text) {
+        throw new Error("Missing text of objective: " + obj.$.id);
+      }
       acc[obj.$.id] = objective;
       return acc;
     }, {}),
     rewards: {},
   };
+
+  if (objectives.$?.ordered) {
+    toReturn.areObjectivesOrdered = true;
+  }
 
   if (rewards.item) {
     toReturn.rewards.items = rewards.item.reduce((acc, item) => {
@@ -93,12 +108,14 @@ const parseXml = async (xmlString) => {
   if (objectivesArr.length == 0) {
     throw new Error("Need atleast one objective");
   }
+
   if (
-    objectivesArr.find(
-      (obj) => !["progress", "check", "talk"].includes(obj.type)
-    )
+    objectivesArr.find((obj) => !WHITELISTED_OBJECTIVE_TYPES.includes(obj.type))
   ) {
-    throw new Error("Objective has to be either progress type or check type");
+    throw new Error(
+      "Objective has to be one of the following types: " +
+        WHITELISTED_OBJECTIVE_TYPES
+    );
   }
 
   return toReturn;

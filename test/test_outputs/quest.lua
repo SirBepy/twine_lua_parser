@@ -1,6 +1,6 @@
 return {
   passages = {
-    Dueling_Chefs_Part1_FindKitchenBlueprints = {
+    quest_start = {
       quest = {
         title = "Dueling Chefs: Part 1",
         description = "Help Chef A repair his kitchen and make lunch for his wife.",
@@ -11,13 +11,33 @@ return {
         },
         objectives = {
           bench = {
-            text = "Find the bench blueprint for Chef A.",
+            text = "Objective that gets completed by manipulating this objective itself",
             type = "check"
           },
+          specific_item = {
+            text = "Objective gets completed if this prop returns truthy",
+            type = "check",
+            observe = "tycoon_progress.48a98fn2-419n-41hz-vn82-9815n89zcv92"
+          },
           rocks = {
-            text = "Find 3 Rocks.",
+            text = "Objective that gets completed by incrementing this abstract number only for this objective",
             type = "progress",
             goal = 3
+          },
+          rocks2 = {
+            text = "Objective that gets completed by incrementing this specific prop number",
+            type = "progress",
+            observe = "inventory.rocks",
+            goal = 3
+          },
+          purchases = {
+            text = "Objective that gets completed by manipulating items within the list that are props",
+            type = "list"
+          },
+          askCheffie = {
+            text = "Objective that gets completed by talking to a specific NPC",
+            type = "talk",
+            goal = "CheffieA"
           }
         },
         rewards = {
@@ -27,7 +47,8 @@ return {
           props = {
             gold = 50
           }
-        }
+        },
+        areObjectivesOrdered = true
       },
       redirects = {
         {
@@ -37,39 +58,20 @@ return {
       },
       lines = {
         {
-          text = "This is an absolute disaster!",
+          text = "This is a test",
           name = "ChefA"
         },
         {
-          text = "What's wrong?",
+          text = "Okay",
           name = "Player"
         },
         {
-          text = "My table is broken",
-          name = "ChefA"
-        },
-        {
-          text = "Maybe I can help?",
-          name = "Player"
-        },
-        {
-          text = "Better than just standing around!",
-          name = "ChefA"
-        },
-        {
-          text = "We'll need plans for a [Bench] and [3 Rocks]"
-        },
-        {
-          text = "I'll get to it!",
-          name = "Player"
-        },
-        {
-          text = "An absolute disaster…",
+          text = "Find a [Bench Blueprint]",
           name = "ChefA"
         }
       }
     },
-    Dueling_Chefs_Part1_Return = {
+    quest_return = {
       lines = {
         {
           text = "Hey!",
@@ -77,7 +79,7 @@ return {
         }
       }
     },
-    Dueling_Chefs_Part1_Complete = {
+    quest_complete = {
       redirects = {
         {
           link = "Default",
@@ -95,7 +97,30 @@ return {
         }
       }
     },
-    Default = {
+    default = {
+      quest = {
+        title = "Dueling Chefs: Part 2",
+        description = "Description",
+        turnInNPC = "ChefA",
+        links = {
+          onReturn = "Dueling_Chefs_Part1_Return",
+          onComplete = "Dueling_Chefs_Part1_Complete"
+        },
+        objectives = {
+          bench = {
+            text = "Objective that gets completed by manipulating this objective itself",
+            type = "check"
+          }
+        },
+        rewards = {
+          items = {
+            black_sword = 1
+          },
+          props = {
+            gold = 50
+          }
+        }
+      },
       lines = {
         {
           text = "Now Ill always say this"
@@ -104,5 +129,5 @@ return {
     }
   },
   name = "Shroomshire Restoration",
-  start_node_name = "Dueling_Chefs_Part1_FindKitchenBlueprints"
+  start_node_name = "quest_start"
 }
