@@ -6,27 +6,26 @@
     window.renderError = (message) => {
       const output = document.getElementById("output");
 
-      console.log('=>', message);
-      // Set the error message as the output content
       output.innerHTML += `<br /> <strong>Error:</strong> ${message}`;
 
-      // Change the background color and text color
-      output.style.backgroundColor = "#68403e"; // Red color for errors
-      output.style.color = "#fff"; // White text for contrast
-      output.style.border = "1px solid #cc0000"; // Optional border for emphasis
-      output.style.fontSize = "1em"
-
+      output.style.backgroundColor = "#68403e";
+      output.style.color = "#fff";
+      output.style.border = "1px solid #cc0000";
+      output.style.fontSize = "1em";
 
       const copyButton = document.getElementById("copyButton");
       copyButton.style.display = "none";
-    }
+    };
 
     window.onerror = function (message, source, lineno, colno, error) {
-      setTimeout(() => window.renderError(error?.message || message), 100)
+      setTimeout(() => window.renderError(error?.message || message), 100);
       return true;
     };
     window.onunhandledrejection = function (event) {
-      setTimeout(() => window.renderError(event.reason?.message || event.reason), 100)
+      setTimeout(
+        () => window.renderError(event.reason?.message || event.reason),
+        100
+      );
       return true;
     };
 
@@ -163,8 +162,6 @@
       right: 0;
     }
   </style>
-
-
 </head>
 
 <body>
@@ -215,6 +212,12 @@
       findUnrecognizedNames();
     }
 
+    function removeFromRecognizedNames(name) {
+      t.splice(t.indexOf(name), 1);
+      localStorage.setItem("savedNames", JSON.stringify(savedNames));
+      findUnrecognizedNames();
+    }
+
     function findUnrecognizedNames() {
       const text = document.getElementById("output").innerText;
       const unrecognized = {};
@@ -229,14 +232,17 @@
         }
       });
 
-      displayNamesInList(savedNames, "savedNames", "-", (name) =>
-        addToRecognizedNames(name)
+      displayNamesInList(
+        savedNames,
+        "savedNames",
+        "-",
+        removeFromRecognizedNames
       );
       displayNamesInList(
         Object.keys(unrecognized),
         "unrecognizedNames",
         "+",
-        (name) => addToRecognizedNames(name)
+        addToRecognizedNames
       );
     }
 
