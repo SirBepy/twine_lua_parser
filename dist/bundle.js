@@ -12382,30 +12382,21 @@
 	};
 
 	const sanitizeText = (text) => {
-	  let decodedText = new TextDecoder("utf-8").decode(
-	    new TextEncoder().encode(text)
-	  );
+	  if (!text) return text;
 
-	  // If text still contains weird encoding, try decoding as Windows-1252
-	  if (decodedText.includes("â") || decodedText.includes("�")) {
-	    decodedText = new TextDecoder("windows-1252").decode(
-	      new TextEncoder().encode(text)
-	    );
-	  }
-
-	  return decodedText
+	  return text
 	    .replace(/&lt;/g, "<")
 	    .replace(/&gt;/g, ">")
 	    .replace(/&amp;/g, "&")
 	    .replace(/&quot;/g, '"')
 	    .replace(/&#39;/g, "'")
 	    .replace(/&hellip;/g, "...")
+
 	    .replace(/â€¦/g, "...")
-	    .replace(/â€™/g, "'")
-	    .replace(/â€œ/g, '"')
-	    .replace(/â€/g, '"')
-	    .replace(/â€“/g, "–")
-	    .replace(/â€”/g, "—")
+	    .replace(/â€™|â€˜/g, "'")
+	    .replace(/â€œ|â€/g, '"')
+	    .replace(/â€“/g, "-")
+	    .replace(/â€”/g, "--")
 	    .replace(/…/g, "...");
 	};
 
