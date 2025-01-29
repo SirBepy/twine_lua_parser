@@ -104,16 +104,19 @@
       background-color: #2c446d;
       border: #1e2c46 2px solid;
       flex: 1;
+
+      overflow-y: auto;
+      box-sizing: border-box;
     }
 
-    #unrecognizedNames button {
-      display: absolute;
+    ul button {
       position: absolute;
       width: 32px;
       height: 32px;
       border-radius: 32px;
       top: 50%;
       left: -10px;
+      cursor: pointer;
       transform: translate(-100%, -50%);
 
       font-size: 1.5em;
@@ -122,13 +125,12 @@
 
     ul {
       list-style: none;
-      overflow-y: auto;
-      height: 100%;
     }
 
     li {
       position: relative;
       padding: 1em 0;
+      margin-left: 3em;
     }
 
     button {
