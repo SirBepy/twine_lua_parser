@@ -198,7 +198,7 @@
         nameDiv.textContent = name;
 
         const button = document.createElement("button");
-        button.textContent = "+";
+        button.textContent = buttonText;
         button.onclick = () => buttonFunction(name);
 
         nameDiv.appendChild(button);
@@ -213,7 +213,7 @@
     }
 
     function removeFromRecognizedNames(name) {
-      t.splice(t.indexOf(name), 1);
+      savedNames.splice(savedNames.indexOf(name), 1);
       localStorage.setItem("savedNames", JSON.stringify(savedNames));
       findUnrecognizedNames();
     }
