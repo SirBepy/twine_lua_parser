@@ -129,11 +129,18 @@ const parseXml = async (xmlString) => {
 };
 
 const sanitizeText = (text) => {
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder("utf-8");
-  const bytes = encoder.encode(text);
-  return decoder
-    .decode(bytes)
+  let decodedText = new TextDecoder("utf-8").decode(
+    new TextEncoder().encode(text)
+  );
+
+  // If text still contains weird encoding, try decoding as Windows-1252
+  if (decodedText.includes("â") || decodedText.includes("�")) {
+    decodedText = new TextDecoder("windows-1252").decode(
+      new TextEncoder().encode(text)
+    );
+  }
+
+  return decodedText
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&")
