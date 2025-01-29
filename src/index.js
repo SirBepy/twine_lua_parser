@@ -32,14 +32,24 @@ const parseQuestData = (lines) => {
   return parseXml(questHTML);
 };
 
+const sanitizeXMLText = (xmlString) => {
+  return xmlString.replace(/&(?![a-zA-Z]+;|#\d+;|#x[0-9a-fA-F]+;)/g, "&amp;");
+};
+
 const parseXml = async (xmlString) => {
   const parser = new Parser();
-  const { quest } = await parser.parseStringPromise(xmlString);
+  const { quest } = await parser.parseStringPromise(sanitizeXMLText(xmlString));
 
   const safeGet = (param) => {
-    if (!quest[param]?.[0])
+    const result = quest[param]?.[0];
+    if (!result)
       window.renderError("Missing important quest parameter: " + param);
-    return quest[param][0];
+
+    if (typeof result == "string") {
+      return sanitizeText(result);
+    }
+
+    return result;
   };
 
   const objectives = safeGet("objectives");
@@ -56,7 +66,7 @@ const parseXml = async (xmlString) => {
 
     objectives: objectives.objective.reduce((acc, obj) => {
       const objective = {
-        text: obj._?.trim(),
+        text: sanitizeText(obj._?.trim()),
         type: obj.$.type,
         observe: obj.$.observe,
       };

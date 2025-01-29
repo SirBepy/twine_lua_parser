@@ -2,7 +2,7 @@ return {
   passages = {
     quest_start = {
       quest = {
-        title = "Dueling Chefs: Part 1",
+        title = "Dueling Chefs: Part 1 &amp; not 2",
         description = "Help Chef A repair his kitchen and make lunch for his wife.",
         turnInNPC = "ChefA",
         links = {
@@ -58,7 +58,7 @@ return {
       },
       lines = {
         {
-          text = "This is a test",
+          text = "This is a &amp; test",
           name = "ChefA"
         },
         {
