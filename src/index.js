@@ -131,7 +131,13 @@ const parseXml = async (xmlString) => {
 const sanitizeText = (text) => {
   if (!text) return text;
 
-  return text
+  // Decode from Windows-1252 to UTF-8
+  const decoder = new TextDecoder("windows-1252");
+  const encoder = new TextEncoder();
+
+  let decodedText = decoder.decode(encoder.encode(text));
+
+  return decodedText
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&")
