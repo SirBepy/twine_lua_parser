@@ -17,7 +17,7 @@ return {
           text = "Still excited"
         },
         {
-          text = "Now IÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢m sad",
+          text = "Now I'm sad",
           emotion = "sad"
         },
         {
