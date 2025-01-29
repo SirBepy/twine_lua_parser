@@ -1,6 +1,9 @@
+<!DOCTYPE html>
 <html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{STORY_NAME}}</title>
   <script type="text/javascript">
     window.renderError = (message) => {
@@ -208,12 +211,14 @@
 
     function addToRecognizedNames(name) {
       savedNames.push(name);
+      savedNames.sort()
       localStorage.setItem("savedNames", JSON.stringify(savedNames));
       findUnrecognizedNames();
     }
 
     function removeFromRecognizedNames(name) {
       savedNames.splice(savedNames.indexOf(name), 1);
+      savedNames.sort()
       localStorage.setItem("savedNames", JSON.stringify(savedNames));
       findUnrecognizedNames();
     }
