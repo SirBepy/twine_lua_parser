@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{STORY_NAME}}</title>
   <script type="text/javascript">
-    window.renderError = (message) => {
+    window.renderError = (message, ...rest) => {
       const output = document.getElementById("output");
 
+      console.error(message, ...rest)
       output.innerHTML += `<br /> <strong>Error:</strong> ${message}`;
 
       output.style.backgroundColor = "#68403e";
@@ -21,7 +22,7 @@
     };
 
     window.onerror = function (message, source, lineno, colno, error) {
-      setTimeout(() => window.renderError(error?.message || message), 100);
+      setTimeout(() => window.renderError(error?.message || message, source, lineno, colno, error), 100);
       return true;
     };
     window.onunhandledrejection = function (event) {
