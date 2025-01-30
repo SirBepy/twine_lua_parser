@@ -12337,7 +12337,7 @@
 	        checkProp(objective, "goal", "objective", obj.$.id);
 	      } else if (objective.type === "talk") {
 	        objective.npc = obj.$.npc;
-	        objective.passageId = obj.$.passageid;
+	        objective.passageId = parseLink(obj.$.passageid);
 
 	        checkProp(objective, "npc", "objective", obj.$.id);
 	        checkProp(objective, "passageId", "objective", obj.$.id);
