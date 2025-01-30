@@ -12266,7 +12266,8 @@
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
-	const parseLink = (text) => text.trim().replace(/^!*\[\[|\]\]!*$/g, "");
+	const parseLink = (text) =>
+	  (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
 	const parseQuestData = (lines) => {
 	  const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
@@ -12305,6 +12306,11 @@
 	    return result;
 	  };
 
+	  const checkProp = (obj, valueKey, parentName, parentId) => {
+	    if (obj[valueKey]) return;
+	    window.renderError?.(`Missing ${valueKey} on ${parentName}: ${parentId}`);
+	  };
+
 	  const objectives = safeGet("objectives");
 	  const rewards = safeGet("rewards");
 
@@ -12326,20 +12332,19 @@
 
 	      if (objective.type === "progress") {
 	        const goal = parseInt(obj.$.goal);
-	        if (!goal || goal <= 0) {
-	          window.renderError("Missing goal of objective: " + obj.$.id);
-	        }
 	        objective.goal = goal;
+
+	        checkProp(objective, "goal", "objective", obj.$.id);
 	      } else if (objective.type === "talk") {
-	        objective.goal = obj.$.goal;
+	        objective.npc = obj.$.npc;
+	        objective.passageId = obj.$.passageid;
+
+	        checkProp(objective, "npc", "objective", obj.$.id);
+	        checkProp(objective, "passageId", "objective", obj.$.id);
 	      }
 
-	      if (!objective.type) {
-	        window.renderError("Missing type of objective: " + obj.$.id);
-	      }
-	      if (!objective.text) {
-	        window.renderError("Missing text of objective: " + obj.$.id);
-	      }
+	      checkProp(objective, "text", "objective", obj.$.id);
+	      checkProp(objective, "type", "objective", obj.$.id);
 	      acc[obj.$.id] = objective;
 	      return acc;
 	    }, {}),
@@ -12493,7 +12498,7 @@
 	  if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
 	    toReturn.isUrgent = true;
 	  }
-	  if (emotion) toReturn.emotion = emotion;
+	  if (emotion) toReturn.emotion = emotion.toLowerCase();
 
 	  return toReturn;
 	};
@@ -12602,6 +12607,12 @@
 	};
 
 	const convertStory = async (story) => {
+	  if (!window?.renderError) {
+	    window.renderError = (message) => {
+	      throw new Error(message);
+	    };
+	  }
+
 	  const passages = story.getElementsByTagName("tw-passagedata");
 	  const convertedPassages = await Promise.all(
 	    Array.prototype.slice.call(passages).map(convertPassage)
