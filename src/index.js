@@ -240,7 +240,7 @@ const parseResponse = ({ unparsedText, emotion }) => {
   if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
     toReturn.isUrgent = true;
   }
-  if (emotion) toReturn.emotion = emotion;
+  if (emotion) toReturn.emotion = emotion.toLowerCase();
 
   return toReturn;
 };
