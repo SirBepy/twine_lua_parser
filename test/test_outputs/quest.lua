@@ -37,7 +37,8 @@ return {
           askCheffie = {
             text = "Objective that gets completed by talking to a specific NPC",
             type = "talk",
-            goal = "CheffieA"
+            npc = "CheffieA",
+            passageId = "quest_return"
           }
         },
         rewards = {
