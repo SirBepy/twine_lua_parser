@@ -208,6 +208,7 @@
     const savedNames = JSON.parse(localStorage.getItem("savedNames") || "[]");
     const nameRegex = /@(\w+)/g;
     const turnInNPCRegex = /\b(turnInNPC|name)\b\s*=\s*"(\w+)"/g;
+    let debounce = false
 
     function displayNamesInList(names, id, buttonText, buttonFunction) {
       const unrecognizedDiv = document.getElementById(id);
@@ -219,7 +220,13 @@
 
         const button = document.createElement("button");
         button.textContent = buttonText;
-        button.onclick = () => buttonFunction(name);
+        button.onclick = () => {
+          if (debounce) return
+          debounce = true
+          buttonFunction(name)
+
+          setTimeout(() => debounce = false, 1000);
+        };
 
         nameDiv.appendChild(button);
         unrecognizedDiv.appendChild(nameDiv);
