@@ -19,16 +19,16 @@
         <objective type="check" id="specific_item" observe="tycoon_progress.48a98fn2-419n-41hz-vn82-9815n89zcv92">
           Objective gets completed if this prop returns truthy</objective>
 
-        <objective type="progress" id="rocks" goal="3">
+        <objective type="progress" id="rocks" goal="3" keyword="rocks">
           Objective that gets completed by incrementing this abstract number only for this objective
         </objective>
         <objective type="progress" id="rocks2" goal="3" observe="inventory.rocks">
           Objective that gets completed by incrementing this specific prop number</objective>
         <objective type="list" id="purchases">
           Objective that gets completed by manipulating items within the list that are props
-          <list-item id="tycoon_progress.0baed953-25f2-4a26-afc4-024b10797e99"></list-item>
-          <list-item id="tycoon_progress.845189fe-f2aa-9fc8-4ncz-084818s8f8a8"></list-item>
-          <list-item id="tycoon_progress.14fhz8am-v341-4123-n4gz-4h89189vna92"></list-item>
+          <list-item>tycoon_progress.0baed953-25f2-4a26-afc4-024b10797e99</list-item>
+          <list-item>tycoon_progress.845189fe-f2aa-9fc8-4ncz-084818s8f8a8</list-item>
+          <list-item>tycoon_progress.14fhz8am-v341-4123-n4gz-4h89189vna92</list-item>
         </objective>
 
         <objective type="talk" id="askCheffie" npc="CheffieA" passageid="[[quest_return]]">

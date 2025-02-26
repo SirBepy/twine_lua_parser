@@ -75,6 +75,7 @@ const parseXml = async (xmlString) => {
         text: sanitizeText(obj._?.trim()),
         type: obj.$.type,
         observe: obj.$.observe,
+        keyword: obj.$.keyword,
       };
 
       if (objective.type === "progress") {
@@ -82,6 +83,11 @@ const parseXml = async (xmlString) => {
         objective.goal = goal;
 
         checkProp(objective, "goal", "objective", obj.$.id);
+      } else if (objective.type === "list") {
+        objective.items = obj["list-item"].reduce((acc, itemId) => {
+          console.log(acc, itemId);
+          return [...acc, itemId?.trim()];
+        }, []);
       } else if (objective.type === "talk") {
         objective.npc = obj.$.npc;
         objective.passageId = parseLink(obj.$.passageid);

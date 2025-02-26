@@ -207,7 +207,7 @@
   <script>
     const savedNames = JSON.parse(localStorage.getItem("savedNames") || "[]");
     const nameRegex = /@(\w+)/g;
-    const turnInNPCRegex = /\b(turnInNPC|name)\b\s*=\s*"(\w+)"/g;
+    const turnInNPCRegex = /\b(turnInNPC|name|npc)\b\s*=\s*"(\w+)"/g;
     let debounce = false
 
     function displayNamesInList(names, id, buttonText, buttonFunction) {
