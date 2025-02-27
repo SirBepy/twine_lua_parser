@@ -29,6 +29,7 @@ return {
             text = "Objective that gets completed by incrementing this specific prop number",
             type = "progress",
             observe = "inventory.rocks",
+            dependsOn = "rocks",
             goal = 3
           },
           purchases = {

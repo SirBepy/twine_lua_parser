@@ -22,7 +22,7 @@
         <objective type="progress" id="rocks" goal="3" keyword="rocks">
           Objective that gets completed by incrementing this abstract number only for this objective
         </objective>
-        <objective type="progress" id="rocks2" goal="3" observe="inventory.rocks">
+        <objective type="progress" id="rocks2" goal="3" observe="inventory.rocks" depends_on="rocks">
           Objective that gets completed by incrementing this specific prop number</objective>
         <objective type="list" id="purchases">
           Objective that gets completed by manipulating items within the list that are props
