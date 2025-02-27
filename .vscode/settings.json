@@ -3,5 +3,6 @@
     "activityBar.background": "#51192E",
     "titleBar.activeBackground": "#722340",
     "titleBar.activeForeground": "#FEFCFC"
-  }
+  },
+  "twee3LanguageTools.storyformat.current": "twine to lua parser-0"
 }

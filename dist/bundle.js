@@ -12290,6 +12290,17 @@
 	  return xmlString.replace(/&(?![a-zA-Z]+;|#\d+;|#x[0-9a-fA-F]+;)/g, "&amp;");
 	};
 
+	const checkObjectivesAreOkay = (toReturn) => {
+	  for (const key in toReturn.objectives) {
+	    const { dependsOn } = toReturn.objectives[key];
+	    if (!dependsOn) continue;
+	    if (!toReturn.objectives[dependsOn])
+	      window.renderError(
+	        `Objective ${key} has dependency "${dependsOn}" that does not exist`
+	      );
+	  }
+	};
+
 	const parseXml = async (xmlString) => {
 	  const parser = new xml2jsExports.Parser();
 	  const { quest } = await parser.parseStringPromise(sanitizeXMLText(xmlString));
@@ -12329,6 +12340,7 @@
 	        type: obj.$.type,
 	        observe: obj.$.observe,
 	        keyword: obj.$.keyword,
+	        dependsOn: obj.$.depends_on,
 	      };
 
 	      if (objective.type === "progress") {
@@ -12356,6 +12368,8 @@
 	    }, {}),
 	    rewards: {},
 	  };
+
+	  checkObjectivesAreOkay(toReturn);
 
 	  if (objectives.$?.ordered) {
 	    toReturn.areObjectivesOrdered = true;
