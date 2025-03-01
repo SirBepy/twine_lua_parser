@@ -1,7 +1,7 @@
 return {
   passages = {
     quest_start = {
-      tags = "Mayor",
+      npcName = "Mayor",
       quest = {
         title = "Dueling Chefs: Part 1 &amp; not 2",
         npcName = "Mayor",
@@ -80,7 +80,7 @@ return {
       }
     },
     quest_return = {
-      tags = "Mayor",
+      npcName = "Mayor",
       lines = {
         {
           text = "Hey!",
@@ -89,7 +89,7 @@ return {
       }
     },
     quest_complete = {
-      tags = "Mayor",
+      npcName = "Mayor",
       redirects = {
         {
           link = "Default",
@@ -112,7 +112,7 @@ return {
       }
     },
     default = {
-      tags = "Mayor",
+      npcName = "Mayor",
       quest = {
         title = "Dueling Chefs: Part 2",
         npcName = "Mayor",

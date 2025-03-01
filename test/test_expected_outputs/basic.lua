@@ -1,7 +1,7 @@
 return {
   passages = {
     example_start = {
-      tags = "Mayor",
+      npcName = "Mayor",
       lines = {
         {
           text = "I'm one guy...",
@@ -24,6 +24,32 @@ return {
         {
           text = "I'm the player",
           name = "Player"
+        }
+      }
+    },
+    grouped_lines = {
+      npcName = "Mayor",
+      grouppedLines = {
+        {
+          {
+            text = "First I will say this",
+            name = "CharA"
+          },
+          {
+            text = "And say something else"
+          }
+        },
+        {
+          {
+            text = "Then I'll say this second",
+            name = "CharA"
+          }
+        },
+        {
+          {
+            text = "Lastly I will say this",
+            name = "CharA"
+          }
         }
       }
     }
