@@ -33,6 +33,7 @@ describe("Converting to Lua", function () {
       await window.parseTwineToLua(story, `output`);
       const result = document.getElementById(`output`).innerHTML;
       fs.writeFileSync(`./test/test_outputs/${fileName}.lua`, result);
+      // fs.writeFileSync(`./test/test_expected_outputs/${fileName}.lua`, result);
 
       expect(expected).to.equal(result);
     });
