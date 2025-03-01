@@ -1,5 +1,5 @@
 <tw-storydata name="Shroomshire Restoration" startnode="1">
-  <tw-passagedata pid="1" name="example_start">
+  <tw-passagedata pid="1" tags="Mayor" name="example_start">
     $highlight = true
     $props.something = 1
 
@@ -9,13 +9,13 @@
 
     [[---|example_option_a]]
   </tw-passagedata>
-  <tw-passagedata pid="2" name="example_option_a">
+  <tw-passagedata pid="2" tags="Mayor" name="example_option_a">
     @Player: I will say this every time, but the next line will only be said if
     ?(props.highlight) @CharA: First optional thing
     ?(quest.example_start > 5) @CharA: Second optional thing
     ?(quest.example_start.collect_apples > 5) @CharA: Third optional thing
     [[?(props.highlight2 < 4)|Hey!|example_option_b]] </tw-passagedata>
-      <tw-passagedata pid="3" name="example_option_b">
+      <tw-passagedata pid="3" tags="Mayor" name="example_option_b">
         @Player: This is the end
       </tw-passagedata>
 </tw-storydata>

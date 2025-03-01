@@ -1,10 +1,10 @@
 return {
   passages = {
     quest_start = {
+      tags = "Mayor",
       quest = {
         title = "Dueling Chefs: Part 1 &amp; not 2",
-        description = "Help Chef A repair his kitchen and make lunch for his wife.",
-        turnInNPC = "ChefA",
+        npcName = "Mayor",
         links = {
           onReturn = "Dueling_Chefs_Part1_Return",
           onComplete = "Dueling_Chefs_Part1_Complete"
@@ -67,7 +67,7 @@ return {
       lines = {
         {
           text = "This is a &amp; test",
-          name = "ChefA"
+          name = "Mayor"
         },
         {
           text = "Okay",
@@ -75,11 +75,12 @@ return {
         },
         {
           text = "Find a [Bench Blueprint]",
-          name = "ChefA"
+          name = "Mayor"
         }
       }
     },
     quest_return = {
+      tags = "Mayor",
       lines = {
         {
           text = "Hey!",
@@ -88,6 +89,7 @@ return {
       }
     },
     quest_complete = {
+      tags = "Mayor",
       redirects = {
         {
           link = "Default",
@@ -96,20 +98,24 @@ return {
       },
       lines = {
         {
-          text = "You found the plans! Thanks, @Player.",
-          name = "ChefA"
+          text = "You found the plans! Thanks, @P.",
+          name = "Mayor"
+        },
+        {
+          text = "And in record time!",
+          name = "OtherGuy"
         },
         {
           text = "I can still show up that @ChefB...",
-          name = "ChefA"
+          name = "Mayor"
         }
       }
     },
     default = {
+      tags = "Mayor",
       quest = {
         title = "Dueling Chefs: Part 2",
-        description = "Description",
-        turnInNPC = "ChefA",
+        npcName = "Mayor",
         links = {
           onReturn = "Dueling_Chefs_Part1_Return",
           onComplete = "Dueling_Chefs_Part1_Complete"

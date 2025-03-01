@@ -1,6 +1,7 @@
 return {
   passages = {
     example_start = {
+      tags = "Mayor",
       lines = {
         {
           text = "I'm one guy...",

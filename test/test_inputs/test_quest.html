@@ -1,10 +1,10 @@
 <tw-storydata name="Shroomshire Restoration" startnode="1">
   <style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>
   <script role="script" id="twine-user-script" type="text/twine-javascript"></script>
-  <tw-passagedata pid="1" name="quest_start">
-    @ChefA: This is a & test
-    @Player: Okay
-    @ChefA: Find a [Bench Blueprint]
+  <tw-passagedata pid="1" tags="Mayor" name="quest_start">
+    @@: This is a & test
+    @P: Okay
+    @@: Find a [Bench Blueprint]
     [[---|Dueling_Chefs_Part1_Return]]
 
     <quest>
@@ -41,13 +41,14 @@
       </rewards>
     </quest>
   </tw-passagedata>
-  <tw-passagedata pid="2" name="quest_return"> @Player: Hey! </tw-passagedata>
-  <tw-passagedata pid="3" name="quest_complete">
-    @ChefA: You found the plans! Thanks, @Player.
-    @ChefA: I can still show up that @ChefB…
+  <tw-passagedata pid="2" tags="Mayor" name="quest_return"> @P: Hey! </tw-passagedata>
+  <tw-passagedata pid="3" tags="Mayor" name="quest_complete">
+    @@: You found the plans! Thanks, @P.
+    @OtherGuy: And in record time!
+    @@: I can still show up that @ChefB…
     [[---|Default]]
   </tw-passagedata>
-  <tw-passagedata pid="4" name="default">
+  <tw-passagedata pid="4" tags="Mayor" name="default">
     Now Ill always say this
     <quest>
       <title>Dueling Chefs: Part 2</title>
