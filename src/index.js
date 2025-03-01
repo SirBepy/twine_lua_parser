@@ -367,12 +367,12 @@ const convertPassage = async (passage) => {
   const lines = cleanLinesArray(passage.innerHTML.split("\n"));
   const dict = {};
 
-  ["name", "pid", "tags"].forEach((attr) => {
-    const value = passage.attributes[attr]?.value;
-    if (value) dict[attr] = value;
-  });
-
-  const npcName = dict.tags;
+  const name = passage.attributes.name?.value;
+  if (name) dict.name = name;
+  const pid = passage.attributes.pid?.value;
+  if (pid) dict.pid = pid;
+  const npcName = passage.attributes.tags?.value;
+  if (npcName) dict.npcName = npcName;
 
   const quest = await parseQuestData(lines, npcName);
   if (quest) dict.quest = quest;
@@ -390,6 +390,19 @@ const convertPassage = async (passage) => {
 
   // if (dict.tags) dict.tags = dict.tags.split(" ");
   dict.lines = cleanLinesArray(lines).map((text) => parseLine(text, npcName));
+  if (dict.lines.find((item) => item.text == "---")) {
+    dict.grouppedLines = dict.lines.reduce((acc, item) => {
+      console.log("=>", item);
+      if (item.text === "---") {
+        acc.push([]);
+      } else {
+        if (acc.length === 0) acc.push([]);
+        acc[acc.length - 1].push(item);
+      }
+      return acc;
+    }, []);
+    delete dict.lines;
+  }
 
   return dict;
 };
