@@ -7,16 +7,16 @@ const REGEX_CONDITION =
 const REGEX_PROPS =
   /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
-const REGEX_NAME = /@(\w+):/;
+const REGEX_NAME = /@(@|\w+):/;
 
 // TODO: Detect if quests in conditions even exist
 // TODO: Check each passage has atleast one line without a condition
 // TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
 const parseLink = (text) =>
-  (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
+  text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
-const parseQuestData = (lines) => {
+const parseQuestData = (lines, npcName) => {
   const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
   if (questOpeningIndex < 0) return;
   const questClosingIndex = lines.findIndex((line) =>
@@ -30,7 +30,7 @@ const parseQuestData = (lines) => {
 
   lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
 
-  return parseXml(questHTML);
+  return parseXml(questHTML, npcName);
 };
 
 const sanitizeXMLText = (xmlString) => {
@@ -48,14 +48,17 @@ const checkObjectivesAreOkay = (toReturn) => {
   }
 };
 
-const parseXml = async (xmlString) => {
+const parseXml = async (xmlString, npcName) => {
   const parser = new Parser();
   const { quest } = await parser.parseStringPromise(sanitizeXMLText(xmlString));
 
-  const safeGet = (param) => {
+  const safeGet = (param, canIgnore) => {
     const result = quest[param]?.[0];
-    if (!result)
+    if (!result) {
+      if (canIgnore) return;
+
       window.renderError("Missing important quest parameter: " + param);
+    }
 
     if (typeof result == "string") {
       return sanitizeText(result);
@@ -74,11 +77,10 @@ const parseXml = async (xmlString) => {
 
   const toReturn = {
     title: safeGet("title"),
-    description: safeGet("description"),
-    turnInNPC: safeGet("turn-in-npc"),
+    npcName: npcName,
     links: {
       onReturn: parseLink(safeGet("link-on-return")),
-      onComplete: parseLink(safeGet("link-on-complete")),
+      onComplete: parseLink(safeGet("link-on-complete", true)),
     },
 
     objectives: objectives.objective.reduce((acc, obj) => {
@@ -334,7 +336,7 @@ const cleanLinesArray = (texts) => {
     .filter((text) => !!text);
 };
 
-const parseLine = (line) => {
+const parseLine = (line, npcName) => {
   const toReturnLine = {
     text: line
       .replace(REGEX_CONDITION, "")
@@ -348,7 +350,15 @@ const parseLine = (line) => {
 
   if (condition) toReturnLine.condition = condition;
   if (emotion) toReturnLine.emotion = emotion[0].replace(/^\{\{|\}\}$/g, "");
-  if (nameMatch) toReturnLine.name = nameMatch[1];
+  if (nameMatch) {
+    if (nameMatch[1] == "P") {
+      toReturnLine.name = "Player";
+    } else if (nameMatch[1] == "@") {
+      toReturnLine.name = npcName;
+    } else {
+      toReturnLine.name = nameMatch[1];
+    }
+  }
 
   return toReturnLine;
 };
@@ -357,7 +367,14 @@ const convertPassage = async (passage) => {
   const lines = cleanLinesArray(passage.innerHTML.split("\n"));
   const dict = {};
 
-  const quest = await parseQuestData(lines);
+  ["name", "pid", "tags"].forEach((attr) => {
+    const value = passage.attributes[attr]?.value;
+    if (value) dict[attr] = value;
+  });
+
+  const npcName = dict.tags;
+
+  const quest = await parseQuestData(lines, npcName);
   if (quest) dict.quest = quest;
 
   const responses = extractResponsesFromText(lines);
@@ -371,13 +388,8 @@ const convertPassage = async (passage) => {
   const props = extractPropsFromText(lines);
   if (props) dict.props = props;
 
-  ["name", "pid"].forEach((attr) => {
-    const value = passage.attributes[attr].value;
-    if (value) dict[attr] = value;
-  });
-
-  if (dict.tags) dict.tags = dict.tags.split(" ");
-  dict.lines = cleanLinesArray(lines).map(parseLine);
+  // if (dict.tags) dict.tags = dict.tags.split(" ");
+  dict.lines = cleanLinesArray(lines).map((text) => parseLine(text, npcName));
 
   return dict;
 };
