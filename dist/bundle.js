@@ -12256,7 +12256,7 @@
 	const WHITELISTED_OBJECTIVE_TYPES = ["progress", "check", "talk", "list"];
 
 	const REGEX_CONDITION =
-	  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)\s*["']?([^"'\s]+)["']?\)/;
+	  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)?\s*["']?([^"'\s]+)?["']?\)/;
 	const REGEX_PROPS =
 	  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 	const REGEX_EMOTION = /\{\{.+?\}\}/g;
@@ -12477,6 +12477,15 @@
 	    case "<":
 	      comparator = "lt";
 	      // value = parseFloat(value);
+	      break;
+	    case undefined:
+	      comparator = "eq";
+	      value = "true";
+	      break;
+	    default:
+	      window.renderError(
+	        `Found unsupported comparator ${comparator} in ${text}`
+	      );
 	      break;
 	  }
 	  try {
