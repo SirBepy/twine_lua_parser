@@ -11,7 +11,7 @@
   </tw-passagedata>
   <tw-passagedata pid="2" name="example_option_a">
     @Player: I will say this every time, but the next line will only be said if
-    ?(props.highlight == true) @CharA: First optional thing
+    ?(props.highlight) @CharA: First optional thing
     ?(quest.example_start > 5) @CharA: Second optional thing
     ?(quest.example_start.collect_apples > 5) @CharA: Third optional thing
     [[?(props.highlight2 < 4)|Hey!|example_option_b]] </tw-passagedata>
