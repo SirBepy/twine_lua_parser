@@ -77,7 +77,7 @@ const parseXml = async (xmlString, npcName) => {
 
   const toReturn = {
     title: safeGet("title"),
-    npcName: npcName,
+    questGiver: npcName,
     links: {
       onReturn: parseLink(safeGet("link-on-return")),
       onComplete: parseLink(safeGet("link-on-complete", true)),
@@ -372,7 +372,6 @@ const convertPassage = async (passage) => {
   const pid = passage.attributes.pid?.value;
   if (pid) dict.pid = pid;
   const npcName = passage.attributes.tags?.value;
-  if (npcName) dict.npcName = npcName;
 
   const quest = await parseQuestData(lines, npcName);
   if (quest) dict.quest = quest;
