@@ -1,7 +1,6 @@
 return {
   passages = {
     example_start = {
-      npcName = "Mayor",
       responses = {
         {
           link = "example_option_a",
@@ -24,7 +23,6 @@ return {
       }
     },
     example_option_a = {
-      npcName = "Mayor",
       lines = {
         {
           text = "I'm saying one thing and the dialogue is ending here",
@@ -33,7 +31,6 @@ return {
       }
     },
     example_option_b = {
-      npcName = "Mayor",
       redirects = {
         {
           link = "example_end",
@@ -48,7 +45,6 @@ return {
       }
     },
     example_end = {
-      npcName = "Mayor",
       lines = {
         {
           text = "This is the end",

@@ -1,7 +1,6 @@
 return {
   passages = {
     example_start = {
-      npcName = "Mayor",
       redirects = {
         {
           link = "example_option_a",
@@ -32,7 +31,6 @@ return {
       }
     },
     example_option_a = {
-      npcName = "Mayor",
       responses = {
         {
           condition = {
@@ -84,7 +82,6 @@ return {
       }
     },
     example_option_b = {
-      npcName = "Mayor",
       lines = {
         {
           text = "This is the end",

@@ -12265,7 +12265,6 @@
 	// TODO: Detect if quests in conditions even exist
 	// TODO: Check each passage has atleast one line without a condition
 	// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
-	// TODO: Allow random text groups to be used
 
 	const parseLink = (text) =>
 	  text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
@@ -12331,7 +12330,7 @@
 
 	  const toReturn = {
 	    title: safeGet("title"),
-	    npcName: npcName,
+	    questGiver: npcName,
 	    links: {
 	      onReturn: parseLink(safeGet("link-on-return")),
 	      onComplete: parseLink(safeGet("link-on-complete", true)),
@@ -12626,7 +12625,6 @@
 	  const pid = passage.attributes.pid?.value;
 	  if (pid) dict.pid = pid;
 	  const npcName = passage.attributes.tags?.value;
-	  if (npcName) dict.npcName = npcName;
 
 	  const quest = await parseQuestData(lines, npcName);
 	  if (quest) dict.quest = quest;

@@ -1,7 +1,6 @@
 return {
   passages = {
     example_start = {
-      npcName = "Mayor",
       lines = {
         {
           text = "I'm one guy...",
@@ -28,7 +27,6 @@ return {
       }
     },
     grouped_lines = {
-      npcName = "Mayor",
       grouppedLines = {
         {
           {
