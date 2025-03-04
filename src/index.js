@@ -18,7 +18,7 @@ const REGEX_NAME = /@(@|\w+):/;
 const parseLink = (text) =>
   text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
-const parseQuestData = (lines, npcName) => {
+const parseQuestData = (lines, npcName, dialogId) => {
   const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
   if (questOpeningIndex < 0) return;
   const questClosingIndex = lines.findIndex((line) =>
@@ -32,7 +32,7 @@ const parseQuestData = (lines, npcName) => {
 
   lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
 
-  return parseXml(questHTML, npcName);
+  return parseXml(questHTML, npcName, dialogId);
 };
 
 const sanitizeXMLText = (xmlString) => {
@@ -50,7 +50,7 @@ const checkObjectivesAreOkay = (toReturn) => {
   }
 };
 
-const parseXml = async (xmlString, npcName) => {
+const parseXml = async (xmlString, npcName, dialogId) => {
   const parser = new Parser();
   const { quest } = await parser.parseStringPromise(sanitizeXMLText(xmlString));
 
@@ -120,7 +120,9 @@ const parseXml = async (xmlString, npcName) => {
         properties.forEach((propertyKeyWith$) => {
           const propertyKey = propertyKeyWith$.substring(1);
           if (!objective[propertyKey]) {
-            window.renderError("Found weird property: " + propertyKey);
+            window.renderError(
+              `Found weird property "${propertyKey}" in quest ${dialogId}`
+            );
             return;
           }
 
@@ -354,7 +356,7 @@ const cleanLinesArray = (texts) => {
     .filter((text) => !!text);
 };
 
-const parseLine = (line, npcName, quest) => {
+const parseLine = (line, npcName, quest, dialogId) => {
   const toReturnLine = {
     text: line
       .replace(REGEX_CONDITION, "")
@@ -391,7 +393,9 @@ const parseLine = (line, npcName, quest) => {
           quest.objectives[objectiveId][objectiveProperty]
         );
       } catch (error) {
-        window.renderError("Found weird property: " + propertyKeyWith$);
+        window.renderError(
+          `Found weird property "${propertyKeyWith$}" in dialog ${dialogId}`
+        );
       }
     });
   }
@@ -403,13 +407,13 @@ const convertPassage = async (passage) => {
   const lines = cleanLinesArray(passage.innerHTML.split("\n"));
   const dict = {};
 
-  const name = passage.attributes.name?.value;
-  if (name) dict.name = name;
+  const dialogId = passage.attributes.name?.value;
+  if (dialogId) dict.name = dialogId;
   const pid = passage.attributes.pid?.value;
   if (pid) dict.pid = pid;
   const npcName = passage.attributes.tags?.value;
 
-  const quest = await parseQuestData(lines, npcName);
+  const quest = await parseQuestData(lines, npcName, dialogId);
   if (quest) dict.quest = quest;
 
   const responses = extractResponsesFromText(lines);
@@ -425,7 +429,7 @@ const convertPassage = async (passage) => {
 
   // if (dict.tags) dict.tags = dict.tags.split(" ");
   dict.lines = cleanLinesArray(lines).map((text) =>
-    parseLine(text, npcName, quest)
+    parseLine(text, npcName, quest, dialogId)
   );
   if (dict.lines.find((item) => item.text == "---")) {
     dict.grouppedLines = dict.lines.reduce((acc, item) => {
