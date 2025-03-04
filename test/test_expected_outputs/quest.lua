@@ -19,7 +19,7 @@ return {
             observe = "tycoon_progress.48a98fn2-419n-41hz-vn82-9815n89zcv92"
           },
           rocks = {
-            text = "Objective that gets completed by incrementing this abstract number only for this objective",
+            text = "Objective that gets completed by incrementing this abstract number only for this objective rocks 3",
             type = "progress",
             keyword = "rocks",
             goal = 3
@@ -73,7 +73,7 @@ return {
           name = "Player"
         },
         {
-          text = "Find a [Bench Blueprint]",
+          text = "Find a 3 rocks",
           name = "Mayor"
         }
       }

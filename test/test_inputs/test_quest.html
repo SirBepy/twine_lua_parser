@@ -4,12 +4,11 @@
   <tw-passagedata pid="1" tags="Mayor" name="quest_start">
     @@: This is a & test
     @P: Okay
-    @@: Find a [Bench Blueprint]
+    @@: Find a $rocks.goal $rocks.keyword
     [[---|Dueling_Chefs_Part1_Return]]
 
     <quest>
       <title>Dueling Chefs: Part 1 & not 2</title>
-      <description>Help Chef A repair his kitchen and make lunch for his wife.</description>
       <turn-in-npc>ChefA</turn-in-npc>
       <link-on-return> [[Dueling_Chefs_Part1_Return]] </link-on-return>
       <link-on-complete> [[Dueling_Chefs_Part1_Complete]] </link-on-complete>
@@ -20,7 +19,7 @@
           Objective gets completed if this prop returns truthy</objective>
 
         <objective type="progress" id="rocks" goal="3" keyword="rocks">
-          Objective that gets completed by incrementing this abstract number only for this objective
+          Objective that gets completed by incrementing this abstract number only for this objective $keyword $goal
         </objective>
         <objective type="progress" id="rocks2" goal="3" observe="inventory.rocks" depends_on="rocks">
           Objective that gets completed by incrementing this specific prop number</objective>
@@ -52,7 +51,6 @@
     Now Ill always say this
     <quest>
       <title>Dueling Chefs: Part 2</title>
-      <description>Description</description>
       <turn-in-npc>ChefA</turn-in-npc>
       <link-on-return> [[Dueling_Chefs_Part1_Return]] </link-on-return>
       <link-on-complete> [[Dueling_Chefs_Part1_Complete]] </link-on-complete>
