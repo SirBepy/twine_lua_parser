@@ -12257,6 +12257,7 @@
 
 	const REGEX_CONDITION =
 	  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)?\s*["']?([^"'\s]+)?["']?\)/;
+	const REGEX_ITEM_NAMES = /\$(?:(\w+)\.)?(\w+)/g;
 	const REGEX_PROPS =
 	  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
 	const REGEX_EMOTION = /\{\{.+?\}\}/g;
@@ -12352,7 +12353,6 @@
 	        checkProp(objective, "goal", "objective", obj.$.id);
 	      } else if (objective.type === "list") {
 	        objective.items = obj["list-item"].reduce((acc, itemId) => {
-	          console.log(acc, itemId);
 	          return [...acc, itemId?.trim()];
 	        }, []);
 	      } else if (objective.type === "talk") {
@@ -12366,6 +12366,23 @@
 	      checkProp(objective, "text", "objective", obj.$.id);
 	      checkProp(objective, "type", "objective", obj.$.id);
 	      acc[obj.$.id] = objective;
+
+	      const properties = objective.text.match(REGEX_ITEM_NAMES);
+	      if (properties) {
+	        properties.forEach((propertyKeyWith$) => {
+	          const propertyKey = propertyKeyWith$.substring(1);
+	          if (!objective[propertyKey]) {
+	            window.renderError("Found weird property: " + propertyKey);
+	            return;
+	          }
+
+	          objective.text = objective.text.replaceAll(
+	            propertyKeyWith$,
+	            objective[propertyKey]
+	          );
+	        });
+	      }
+
 	      return acc;
 	    }, {}),
 	    rewards: {},
@@ -12589,7 +12606,7 @@
 	    .filter((text) => !!text);
 	};
 
-	const parseLine = (line, npcName) => {
+	const parseLine = (line, npcName, quest) => {
 	  const toReturnLine = {
 	    text: line
 	      .replace(REGEX_CONDITION, "")
@@ -12611,6 +12628,24 @@
 	    } else {
 	      toReturnLine.name = nameMatch[1];
 	    }
+	  }
+
+	  const properties = toReturnLine.text.match(REGEX_ITEM_NAMES);
+	  if (properties) {
+	    properties.forEach((propertyKeyWith$) => {
+	      const [objectiveId, objectiveProperty] = propertyKeyWith$
+	        .substring(1)
+	        .split(".");
+
+	      try {
+	        toReturnLine.text = toReturnLine.text.replaceAll(
+	          propertyKeyWith$,
+	          quest.objectives[objectiveId][objectiveProperty]
+	        );
+	      } catch (error) {
+	        window.renderError("Found weird property: " + propertyKeyWith$);
+	      }
+	    });
 	  }
 
 	  return toReturnLine;
@@ -12641,10 +12676,11 @@
 	  if (props) dict.props = props;
 
 	  // if (dict.tags) dict.tags = dict.tags.split(" ");
-	  dict.lines = cleanLinesArray(lines).map((text) => parseLine(text, npcName));
+	  dict.lines = cleanLinesArray(lines).map((text) =>
+	    parseLine(text, npcName, quest)
+	  );
 	  if (dict.lines.find((item) => item.text == "---")) {
 	    dict.grouppedLines = dict.lines.reduce((acc, item) => {
-	      console.log("=>", item);
 	      if (item.text === "---") {
 	        acc.push([]);
 	      } else {
