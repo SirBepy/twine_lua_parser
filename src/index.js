@@ -18,7 +18,7 @@ const REGEX_NAME = /@(@|\w+):/;
 const parseLink = (text) =>
   text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
-const parseQuestData = (lines, npcName, dialogId) => {
+const parseQuestData = async (lines, npcName, dialogId) => {
   const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
   if (questOpeningIndex < 0) return;
   const questClosingIndex = lines.findIndex((line) =>
@@ -32,7 +32,7 @@ const parseQuestData = (lines, npcName, dialogId) => {
 
   lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
 
-  return parseXml(questHTML, npcName, dialogId);
+  return await parseXml(questHTML, npcName, dialogId);
 };
 
 const sanitizeXMLText = (xmlString) => {
@@ -121,7 +121,7 @@ const parseXml = async (xmlString, npcName, dialogId) => {
           const propertyKey = propertyKeyWith$.substring(1);
           if (!objective[propertyKey]) {
             window.renderError(
-              `Found weird property "${propertyKey}" in quest ${dialogId}`
+              `Found weird property "${propertyKey}" in quest "${dialogId}"`
             );
             return;
           }
@@ -394,7 +394,7 @@ const parseLine = (line, npcName, quest, dialogId) => {
         );
       } catch (error) {
         window.renderError(
-          `Found weird property "${propertyKeyWith$}" in dialog ${dialogId}`
+          `Found weird property "${propertyKeyWith$}" in dialog "${dialogId}"`
         );
       }
     });
