@@ -100,7 +100,7 @@ const parseXml = async (xmlString, npcName, dialogId) => {
 
         checkProp(objective, "goal", "objective", obj.$.id);
       } else if (objective.type === "list") {
-        objective.items = obj["list-item"].reduce((acc, itemId) => {
+        objective.listOfObservables = obj["list-item"].reduce((acc, itemId) => {
           return [...acc, itemId?.trim()];
         }, []);
       } else if (objective.type === "talk") {

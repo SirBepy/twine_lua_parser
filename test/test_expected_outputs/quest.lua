@@ -34,7 +34,7 @@ return {
           purchases = {
             text = "Objective that gets completed by manipulating items within the list that are props",
             type = "list",
-            items = {
+            listOfObservables = {
               "tycoon_progress.0baed953-25f2-4a26-afc4-024b10797e99",
               "tycoon_progress.845189fe-f2aa-9fc8-4ncz-084818s8f8a8",
               "tycoon_progress.14fhz8am-v341-4123-n4gz-4h89189vna92"
