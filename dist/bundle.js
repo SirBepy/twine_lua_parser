@@ -12270,7 +12270,7 @@
 	const parseLink = (text) =>
 	  text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
 
-	const parseQuestData = (lines, npcName, dialogId) => {
+	const parseQuestData = async (lines, npcName, dialogId) => {
 	  const questOpeningIndex = lines.findIndex((line) => line.includes("<quest>"));
 	  if (questOpeningIndex < 0) return;
 	  const questClosingIndex = lines.findIndex((line) =>
@@ -12284,7 +12284,7 @@
 
 	  lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
 
-	  return parseXml(questHTML, npcName, dialogId);
+	  return await parseXml(questHTML, npcName, dialogId);
 	};
 
 	const sanitizeXMLText = (xmlString) => {
@@ -12352,7 +12352,7 @@
 
 	        checkProp(objective, "goal", "objective", obj.$.id);
 	      } else if (objective.type === "list") {
-	        objective.items = obj["list-item"].reduce((acc, itemId) => {
+	        objective.listOfObservables = obj["list-item"].reduce((acc, itemId) => {
 	          return [...acc, itemId?.trim()];
 	        }, []);
 	      } else if (objective.type === "talk") {
@@ -12373,7 +12373,7 @@
 	          const propertyKey = propertyKeyWith$.substring(1);
 	          if (!objective[propertyKey]) {
 	            window.renderError(
-	              `Found weird property "${propertyKey}" in quest ${dialogId}`
+	              `Found weird property "${propertyKey}" in quest "${dialogId}"`
 	            );
 	            return;
 	          }
@@ -12646,7 +12646,7 @@
 	        );
 	      } catch (error) {
 	        window.renderError(
-	          `Found weird property "${propertyKeyWith$}" in dialog ${dialogId}`
+	          `Found weird property "${propertyKeyWith$}" in dialog "${dialogId}"`
 	        );
 	      }
 	    });
