@@ -12,10 +12,14 @@
   <tw-passagedata pid="2" tags="Mayor" name="example_option_a">
     @Player: I will say this every time, but the next line will only be said if
     ?(props.highlight) @CharA: First optional thing
-    ?(quest.example_start > 5) @CharA: Second optional thing
-    ?(quest.example_start.collect_apples > 5) @CharA: Third optional thing
-    [[?(props.highlight2 < 4)|Hey!|example_option_b]] </tw-passagedata>
-      <tw-passagedata pid="3" tags="Mayor" name="example_option_b">
-        @Player: This is the end
-      </tw-passagedata>
+    ?(non_props.example > 5) @CharA: Non props and bigger than testing
+    ?(quest.deeply.nested < 5) @CharA: Third optional thing
+    ?(complex.a > 1 or complex.b < 2 and complex.c) @CharA: This was a complex if statement
+    ![[?(props.urgent_example)|example_option_b]]!
+    [[?(props.simple < 4)|Hey!|example_option_b]] 
+    [[?(complex.a > 1 or complex.b == 1 and complex.c)|Complex Response!|example_option_b]] 
+  </tw-passagedata>
+  <tw-passagedata pid="3" tags="Mayor" name="example_option_b">
+    @Player: This is the end
+  </tw-passagedata>
 </tw-storydata>

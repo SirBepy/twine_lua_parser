@@ -33,14 +33,62 @@ return {
     example_option_a = {
       responses = {
         {
-          condition = {
-            field = "highlight2",
-            type = "props",
-            comparator = "lt",
-            value = 4
+          conditions = {
+            {
+              {
+                field = "simple",
+                type = "props",
+                comparator = "lt",
+                value = 4
+              }
+            }
           },
           link = "example_option_b",
           text = "Hey!"
+        },
+        {
+          conditions = {
+            {
+              {
+                field = "a",
+                type = "complex",
+                comparator = "gt",
+                value = 1
+              }
+            },
+            {
+              {
+                field = "b",
+                type = "complex",
+                comparator = "eq",
+                value = 1
+              },
+              {
+                field = "c",
+                type = "complex",
+                comparator = "eq",
+                value = "true"
+              }
+            }
+          },
+          link = "example_option_b",
+          text = "Complex Response!"
+        }
+      },
+      redirects = {
+        {
+          conditions = {
+            {
+              {
+                field = "urgent_example",
+                type = "props",
+                comparator = "eq",
+                value = "true"
+              }
+            }
+          },
+          link = "example_option_b",
+          isUrgent = true
         }
       },
       lines = {
@@ -50,32 +98,72 @@ return {
         },
         {
           text = "First optional thing",
-          condition = {
-            field = "highlight",
-            type = "props",
-            comparator = "eq",
-            value = true
+          conditions = {
+            {
+              {
+                field = "highlight",
+                type = "props",
+                comparator = "eq",
+                value = "true"
+              }
+            }
           },
           name = "CharA"
         },
         {
-          text = "Second optional thing",
-          condition = {
-            field = "example_start",
-            type = "quest",
-            comparator = "gt",
-            value = 5
+          text = "Non props and bigger than testing",
+          conditions = {
+            {
+              {
+                field = "example",
+                type = "non_props",
+                comparator = "gt",
+                value = 5
+              }
+            }
           },
           name = "CharA"
         },
         {
           text = "Third optional thing",
-          condition = {
-            field = "example_start",
-            subField = "collect_apples",
-            type = "quest",
-            comparator = "gt",
-            value = 5
+          conditions = {
+            {
+              {
+                field = "deeply",
+                subField = "nested",
+                type = "quest",
+                comparator = "lt",
+                value = 5
+              }
+            }
+          },
+          name = "CharA"
+        },
+        {
+          text = "This was a complex if statement",
+          conditions = {
+            {
+              {
+                field = "a",
+                type = "complex",
+                comparator = "gt",
+                value = 1
+              }
+            },
+            {
+              {
+                field = "b",
+                type = "complex",
+                comparator = "lt",
+                value = 2
+              },
+              {
+                field = "c",
+                type = "complex",
+                comparator = "eq",
+                value = "true"
+              }
+            }
           },
           name = "CharA"
         }

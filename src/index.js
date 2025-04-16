@@ -3,8 +3,8 @@ import { Parser } from "xml2js";
 const WHITELISTED_OBJECTIVE_TYPES = ["progress", "check", "talk", "list"];
 
 const REGEX_CONDITION =
-  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)?\s*["']?([^"'\s]+)?["']?\)/;
-const REGEX_WORD = /\$(\w+)/;
+  /\?\((?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)?\s*["']?([^"'\s]+)?["']?(?:\s*(?:or|and)\s*(?:(?:\w+)\.)?(?:\w+)(?:\.(?:\w+))?\s*(?:==|<|>)?\s*["']?(?:[^"'\s]+)?["']?)*\)/;
+
 const REGEX_ITEM_NAMES = /\$(?:(\w+)\.)?(\w+)/g;
 const REGEX_PROPS =
   /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
@@ -13,7 +13,6 @@ const REGEX_NAME = /@(@|\w+):/;
 
 // TODO: Detect if quests in conditions even exist
 // TODO: Check each passage has atleast one line without a condition
-// TODO: allow multiple conditions like: ?($quest.Dueling_Chefs_Part1_FindKitchenBlueprints.bench == false && quest.Dueling_Chefs_Part1_FindKitchenBlueprints.screws) Oh also
 
 const parseLink = (text) =>
   text && (text?._ ?? text).trim().replace(/^!*\[\[|\]\]!*$/g, "");
@@ -236,43 +235,66 @@ const convertToLuaScript = (data) => {
   return `return ${formattedLua}`;
 };
 
-const getCondition = (text) => {
+const getConditions = (text) => {
   const match = text.match(REGEX_CONDITION);
   if (!match) return;
-  let [_, type, field, subField, comparator, value] = match;
 
+  const conditionText = text.match(/\?\((.*)\)/)?.[1];
+  if (!conditionText) return;
+
+  const orConditions = conditionText.split(/\s* or \s*/);
+  if (orConditions.length == 0) return;
+
+  const conditions = orConditions.map((orConditionStr) => {
+    const andConditions = orConditionStr.split(/\s* and \s*/);
+
+    return andConditions
+      .map((andConditionStr) => {
+        const singleMatch = andConditionStr.match(
+          /(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(==|<|>)?\s*["']?([^"'\s and or]+)?["']?/
+        );
+        if (!singleMatch) return;
+
+        const [_, type, field, subField, comparator, value] = singleMatch;
+
+        return {
+          field,
+          subField,
+          type: type ?? "checks",
+          comparator: parseComparator(comparator),
+          value: parseValue(value),
+        };
+      })
+      .filter(Boolean);
+  });
+
+  return conditions.filter((group) => group.length > 0);
+};
+
+const parseComparator = (comparator) => {
   switch (comparator) {
-    case "==":
-      comparator = "eq";
-      break;
-    case ">":
-      comparator = "gt";
-      // value = parseFloat(value);
-      break;
-    case "<":
-      comparator = "lt";
-      // value = parseFloat(value);
-      break;
     case undefined:
-      comparator = "eq";
-      value = "true";
-      break;
+    case "==":
+      return "eq";
+    case ">":
+      return "gt";
+    case "<":
+      return "lt";
+
     default:
-      window.renderError(
-        `Found unsupported comparator ${comparator} in ${text}`
-      );
-      break;
+      window.renderError(`Found unsupported comparator ${comparator}`);
+      return "eq";
   }
+};
+
+const parseValue = (value) => {
+  if (value === undefined) return "true";
   try {
-    value = JSON.parse(value);
-  } catch (error) {}
-  return {
-    field,
-    subField,
-    type: type ?? "checks",
-    comparator,
-    value,
-  };
+    return JSON.parse(value);
+  } catch (error) {
+    console.error("Weird Error:", error);
+    return value;
+  }
 };
 
 const parseResponse = ({ unparsedText, emotion }) => {
@@ -281,12 +303,12 @@ const parseResponse = ({ unparsedText, emotion }) => {
   const toReturn = {};
   if (splitLink.length == 1) toReturn.link = splitLink[0];
 
-  const condition = getCondition(splitLink[0]);
-  if (condition) toReturn.condition = condition;
+  const conditions = getConditions(splitLink[0]);
+  if (conditions) toReturn.conditions = conditions;
 
   if (splitLink.length == 2) {
     toReturn.link = splitLink[1];
-    if (!condition) {
+    if (!conditions) {
       toReturn.text = splitLink[0];
     }
   } else if (splitLink.length == 3) {
@@ -370,11 +392,11 @@ const parseLine = (line, npcName, quest, dialogId) => {
       .replace(REGEX_NAME, "")
       .trim(),
   };
-  const condition = getCondition(line);
+  const conditions = getConditions(line);
   const emotion = line.match(REGEX_EMOTION);
   const nameMatch = line.match(REGEX_NAME);
 
-  if (condition) toReturnLine.condition = condition;
+  if (conditions) toReturnLine.conditions = conditions;
   if (emotion) toReturnLine.emotion = emotion[0].replace(/^\{\{|\}\}$/g, "");
   if (nameMatch) {
     if (nameMatch[1] == "P") {
