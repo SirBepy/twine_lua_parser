@@ -43,4 +43,5 @@ describe("Converting to Lua", function () {
   genericTestFunction("optional");
   genericTestFunction("quest");
   genericTestFunction("redirect");
+  genericTestFunction("props_set");
 });

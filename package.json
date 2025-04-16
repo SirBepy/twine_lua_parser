@@ -1,13 +1,14 @@
 {
   "name": "twine_lua_parser",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "description": "Export your Twine 2 story as a lua file (RobloxStudio)",
   "main": "format.js",
   "type": "module",
   "scripts": {
     "test": "mocha ./test/test.js",
     "build": "npm i && npx rollup -c && node build.js",
-    "full-test": "npm run build && npm run test"
+    "full-test": "npm run build && npm run test",
+    "full-test-without-i": "npx rollup -c && node build.js && npm run test"
   },
   "repository": {
     "type": "git",
