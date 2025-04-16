@@ -7,18 +7,6 @@ return {
           isEnd = true
         }
       },
-      props = {
-        {
-          field = "something",
-          type = "props",
-          value = 1
-        },
-        {
-          field = "highlight",
-          type = "checks",
-          value = true
-        }
-      },
       lines = {
         {
           text = "A variable called highlight has been set to true",
