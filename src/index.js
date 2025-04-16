@@ -7,7 +7,7 @@ const REGEX_CONDITION =
 
 const REGEX_ITEM_NAMES = /\$(?:(\w+)\.)?(\w+)/g;
 const REGEX_PROPS =
-  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*=\s*("[^"]+"|'[^']+'|\b\w+\b|\d+)/;
+  /\$(?:(\w+)\.)?(\w+)(?:\.(\w+))?\s*(=|\+=|-=|\+\+|--)\s*(?:("[^"]+"|'[^']+'|\b\w+\b|\d+))?/;
 const REGEX_EMOTION = /\{\{.+?\}\}/g;
 const REGEX_NAME = /@(@|\w+):/;
 
@@ -362,12 +362,46 @@ const extractPropsFromText = (texts) => {
     const match = currentString.match(REGEX_PROPS);
 
     if (match) {
-      const [_, type, field, subField, value] = match;
+      const [_, type, field, subField, operator, value] = match;
       const prop = { field, type: type ?? "checks" };
+
       try {
-        prop.value = JSON.parse(value);
+        switch (operator) {
+          case "=":
+            prop.operator = "set";
+            try {
+              prop.value = JSON.parse(value);
+            } catch (error) {
+              prop.value = value?.replace(/^["']|["']$/g, "");
+            }
+            break;
+          case "+=":
+            prop.operator = "add";
+            prop.value = JSON.parse(value);
+            break;
+          case "-=":
+            prop.operator = "add";
+            prop.value = -JSON.parse(value);
+            break;
+          case "++":
+            prop.operator = "add";
+            prop.value = 1;
+            break;
+          case "--":
+            prop.operator = "add";
+            prop.value = -1;
+            break;
+          default:
+            window.renderError(
+              `Found unnexpected operator "${operator}" in "${currentString}"`
+            );
+            break;
+        }
       } catch (error) {
-        prop.value = value;
+        window.renderError(
+          `Something went wrong when parsing props "${currentString}": ${error.message}`
+        );
+        continue;
       }
 
       props.push(prop);
