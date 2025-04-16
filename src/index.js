@@ -32,7 +32,13 @@ const parseQuestData = async (lines, npcName, dialogId) => {
 
   lines.splice(questOpeningIndex, questClosingIndex - questOpeningIndex + 1);
 
-  return await parseXml(questHTML, npcName, dialogId);
+  try {
+    return await parseXml(questHTML, npcName, dialogId);
+  } catch (error) {
+    window.renderError(
+      `Something went wrong when parsing ${dialogId} of ${npcName}: ${error.message}`
+    );
+  }
 };
 
 const sanitizeXMLText = (xmlString) => {
