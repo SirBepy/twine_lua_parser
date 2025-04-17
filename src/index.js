@@ -494,15 +494,17 @@ const convertPassage = async (passage) => {
     parseLine(text, npcName, quest, dialogId)
   );
   if (dict.lines.find((item) => item.text == "---")) {
-    dict.grouppedLines = dict.lines.reduce((acc, item) => {
-      if (item.text === "---") {
-        acc.push([]);
-      } else {
-        if (acc.length === 0) acc.push([]);
-        acc[acc.length - 1].push(item);
-      }
-      return acc;
-    }, []);
+    dict.grouppedLines = dict.lines
+      .reduce((acc, item) => {
+        if (item.text === "---") {
+          acc.push([]);
+        } else {
+          if (acc.length === 0) acc.push([]);
+          acc[acc.length - 1].push(item);
+        }
+        return acc;
+      }, [])
+      .filter((arr) => arr.length > 0);
     delete dict.lines;
   }
 
