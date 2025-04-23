@@ -12393,7 +12393,7 @@
 
 	      return acc;
 	    }, {}),
-	    rewards: {},
+	    rewards: [], // Initialize rewards array
 	  };
 
 	  checkObjectivesAreOkay(toReturn);
@@ -12402,18 +12402,22 @@
 	    toReturn.areObjectivesOrdered = true;
 	  }
 
-	  if (rewards.item) {
-	    toReturn.rewards.items = rewards.item.reduce((acc, item) => {
-	      acc[item.$.id] = parseInt(item.$.amount ?? 1);
-	      return acc;
-	    }, {});
-	  }
+	  if (rewards) {
+	    const rewardTypes = Object.keys(rewards).filter((key) => key !== "$");
 
-	  if (rewards.prop) {
-	    toReturn.rewards.props = rewards.prop.reduce((acc, prop) => {
-	      acc[prop.$.id] = parseInt(prop.$.amount ?? 1);
-	      return acc;
-	    }, {});
+	    for (const rewardType of rewardTypes) {
+	      const rewardItems = rewards[rewardType];
+	      if (Array.isArray(rewardItems)) {
+	        rewardItems.forEach((item) => {
+	          toReturn.rewards.push({
+	            type: rewardType,
+	            field: item.$.id,
+	            operator: "add",
+	            value: parseInt(item.$.amount ?? 1),
+	          });
+	        });
+	      }
+	    }
 	  }
 
 	  let objectivesArr = Object.values(toReturn.objectives);
@@ -12577,7 +12581,7 @@
 	  if (unparsedText.startsWith("!") && unparsedText.endsWith("!")) {
 	    toReturn.isUrgent = true;
 	  }
-	  if (emotion) toReturn.emotion = emotion.toLowerCase();
+	  if (emotion) toReturn.emotion = emotion[0].replace(/^\{\{|\}\}$/g, "");
 
 	  return toReturn;
 	};
@@ -12741,6 +12745,8 @@
 
 	  const props = extractPropsFromText(lines);
 	  if (props) dict.props = props;
+
+	  // Keep rewards in the quest object
 
 	  // if (dict.tags) dict.tags = dict.tags.split(" ");
 	  dict.lines = cleanLinesArray(lines).map((text) =>
