@@ -48,11 +48,17 @@ return {
           }
         },
         rewards = {
-          items = {
-            black_sword = 1
+          {
+            type = "item",
+            field = "black_sword",
+            operator = "add",
+            value = 1
           },
-          props = {
-            gold = 50
+          {
+            type = "prop",
+            field = "gold",
+            operator = "add",
+            value = 50
           }
         },
         areObjectivesOrdered = true
@@ -123,11 +129,17 @@ return {
           }
         },
         rewards = {
-          items = {
-            black_sword = 1
+          {
+            type = "item",
+            field = "black_sword",
+            operator = "add",
+            value = 1
           },
-          props = {
-            gold = 50
+          {
+            type = "prop",
+            field = "gold",
+            operator = "add",
+            value = 50
           }
         }
       },
